@@ -1,5 +1,11 @@
 import React from "react";
-import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import {
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import {
   supportedLanguages,
   langCodeToLanguageName,
@@ -12,6 +18,9 @@ export interface LanguageSelectProps {
 }
 
 function LanguageSelect(props: LanguageSelectProps) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
+
   const defaultLanguage = props.defaultLanguage || "es";
 
   const onChange = (event: SelectChangeEvent) => {
@@ -19,10 +28,11 @@ function LanguageSelect(props: LanguageSelectProps) {
   };
 
   return (
-    <Select defaultValue={defaultLanguage} onChange={onChange}>
+    <Select defaultValue={defaultLanguage} fullWidth onChange={onChange}>
       {supportedLanguages.map((language) => (
         <MenuItem value={language}>
-          {`${langCodeToLanguageName(language)} ${langCodeToFlag(language)}`}
+          {!isSmallScreen && langCodeToLanguageName(language)}{" "}
+          {langCodeToFlag(language)}
         </MenuItem>
       ))}
     </Select>
