@@ -1,4 +1,4 @@
-export function getTranslation(
+export function translateTo(
   q: string,
   source: string,
   target: string
