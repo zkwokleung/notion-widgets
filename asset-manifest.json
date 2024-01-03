@@ -1,16 +1,15 @@
 {
   "files": {
-    "main.css": "/notion-widgets/static/css/main.f855e6bc.css",
-    "main.js": "/notion-widgets/static/js/main.713d6973.js",
+    "main.css": "/notion-widgets/static/css/main.e6c13ad2.css",
+    "main.js": "/notion-widgets/static/js/main.3fc94ca0.js",
     "static/js/479.567b4b5a.chunk.js": "/notion-widgets/static/js/479.567b4b5a.chunk.js",
-    "static/media/logo.svg": "/notion-widgets/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/notion-widgets/index.html",
-    "main.f855e6bc.css.map": "/notion-widgets/static/css/main.f855e6bc.css.map",
-    "main.713d6973.js.map": "/notion-widgets/static/js/main.713d6973.js.map",
+    "main.e6c13ad2.css.map": "/notion-widgets/static/css/main.e6c13ad2.css.map",
+    "main.3fc94ca0.js.map": "/notion-widgets/static/js/main.3fc94ca0.js.map",
     "479.567b4b5a.chunk.js.map": "/notion-widgets/static/js/479.567b4b5a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f855e6bc.css",
-    "static/js/main.713d6973.js"
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.3fc94ca0.js"
   ]
 }
