@@ -29,7 +29,7 @@ function TextToSpeech() {
 
   const iconStyle = {
     width: "100%",
-    height: "100%",
+    height: "100vh",
   };
 
   return (
@@ -37,8 +37,11 @@ function TextToSpeech() {
       {!playing ? (
         <StyledIconButton
           onClick={() => {
-            audioRef.current?.play();
-            setPlaying(true);
+            if (audioRef.current) {
+              audioRef.current.currentTime = 0;
+              audioRef.current.play();
+              setPlaying(true);
+            }
           }}
         >
           <PlayCircleIcon color="primary" style={iconStyle} />
@@ -46,8 +49,8 @@ function TextToSpeech() {
       ) : (
         <StyledIconButton
           onClick={() => {
-            audioRef.current?.play();
-            setPlaying(true);
+            audioRef.current?.pause();
+            setPlaying(false);
           }}
         >
           <StopCircleIcon color="primary" style={iconStyle} />
