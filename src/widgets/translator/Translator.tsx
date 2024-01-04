@@ -5,6 +5,7 @@ import styled from "styled-components";
 import LanguageTextArea from "./LanguageTextArea";
 import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
 import { supportedLanguages } from "./translate";
+import DoneIcon from "@mui/icons-material/Done";
 
 const StyledCard = styled(Card)`
   color: white;
@@ -53,6 +54,8 @@ export default function Translator() {
   const [toLanguages, setToLanguages] = useState(to);
 
   const [, setSearchParams] = useSearchParams();
+
+  const [copied, setCopied] = useState(false);
 
   const availableToLanguages = useMemo(() => {
     return supportedLanguages.filter(
@@ -110,6 +113,7 @@ export default function Translator() {
 
   const handleCopyParmalink = () => {
     navigator.clipboard.writeText(document.location.href);
+    setCopied(true);
   };
 
   useEffect(() => {
@@ -135,6 +139,15 @@ export default function Translator() {
     }
   }, [isTyping, text]);
 
+  useEffect(() => {
+    if (copied) {
+      const timeout = setTimeout(() => {
+        setCopied(false);
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [copied]);
+
   return (
     <StyledCard variant="outlined">
       <Grid container rowSpacing={1}>
@@ -144,6 +157,7 @@ export default function Translator() {
             lang={fromLanguage}
             onLangChange={onLanguageSelected}
             onTextChange={onTextChange}
+            placeholder="Type something to translate..."
           />
         </StyledGrid>
 
@@ -169,7 +183,11 @@ export default function Translator() {
       <StyledActionLayout>
         <StyledActionButton onClick={handleAddToLang}>+</StyledActionButton>
         <StyledActionButton onClick={handleCopyParmalink}>
-          Copy Parmalink
+          {copied ? (
+            <DoneIcon fontSize="small" color="success" />
+          ) : (
+            "Copy Parmalink"
+          )}
         </StyledActionButton>
       </StyledActionLayout>
     </StyledCard>

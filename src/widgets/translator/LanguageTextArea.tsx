@@ -11,6 +11,7 @@ export interface LanguageTextAreaProps {
   lang: string;
   input?: boolean;
   availableLangs?: string[];
+  placeholder?: string;
 
   onLangChange?: (value: string) => void;
   onTextChange?: (value: string) => void;
@@ -74,7 +75,7 @@ function LanguageTextArea(props: LanguageTextAreaProps) {
           id="outlined-multiline-static"
           multiline
           rows={1}
-          placeholder="Translated text here"
+          placeholder={props.placeholder ?? "..."}
           aria-readonly={true}
           inputProps={{ readOnly: !props.input }}
           value={text}
