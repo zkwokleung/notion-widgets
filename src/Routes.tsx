@@ -2,6 +2,7 @@ import { createHashRouter } from "react-router-dom";
 import Home from "./pages/home/Home";
 import ErrorPage from "./pages/error/ErrorPage";
 import Translator from "./widgets/translator/Translator";
+import TranslatorInitContextProvider from "./widgets/translator/TranslatorInitContextProvider";
 
 const router = createHashRouter([
   {
@@ -19,7 +20,11 @@ const router = createHashRouter([
 
   {
     path: "/translator",
-    element: <Translator />,
+    element: (
+      <TranslatorInitContextProvider>
+        <Translator />
+      </TranslatorInitContextProvider>
+    ),
   },
 ]);
 
