@@ -1,70 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { IconButton } from "@mui/material";
-import { getTextToSpeechURL } from "./textToSpeechUtils";
-import PlayCircleIcon from "@mui/icons-material/PlayCircle";
-import StopCircleIcon from "@mui/icons-material/StopCircle";
-import styled from "styled-components";
-
-const StyledIconButton = styled(IconButton)`
-  min-width: 100%;
-`;
+import { useTextToSpeechInitContext } from "./TextToSpeechInitContextProvider";
 
 function TextToSpeech() {
-  const params = useParams<{ lang: string; text: string }>();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying] = useState(false);
+  const { speechTexts } = useTextToSpeechInitContext();
 
-  useEffect(() => {
-    if (!audioRef.current) return;
+  const { lang } = useParams<{ lang: string }>();
 
-    const audio = audioRef.current;
-    const onEnded = () => setPlaying(false);
-    audio.addEventListener("ended", onEnded);
+  // TTS states
+  const [currentLang, setLang] = useState("en" as string);
 
-    return () => {
-      audio.removeEventListener("ended", onEnded);
-    };
-  });
-
-  const iconStyle = {
-    width: "100%",
-    height: "100vh",
-  };
-
-  return (
-    <>
-      {!playing ? (
-        <StyledIconButton
-          onClick={() => {
-            if (audioRef.current) {
-              audioRef.current.currentTime = 0;
-              audioRef.current.play();
-              setPlaying(true);
-            }
-          }}
-        >
-          <PlayCircleIcon color="primary" style={iconStyle} />
-        </StyledIconButton>
-      ) : (
-        <StyledIconButton
-          onClick={() => {
-            audioRef.current?.pause();
-            setPlaying(false);
-          }}
-        >
-          <StopCircleIcon color="primary" style={iconStyle} />
-        </StyledIconButton>
-      )}
-
-      {params.lang && params.text && (
-        <audio
-          src={getTextToSpeechURL(params.lang, params.text)}
-          ref={audioRef}
-        />
-      )}
-    </>
-  );
+  return <></>;
 }
 
 export default TextToSpeech;

@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
-import { supportedLanguages } from "./translate";
+import { supportedLanguages } from "../../utils/lang";
 
 interface TranslatorInitContextReturn {
   from: string;

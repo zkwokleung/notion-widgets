@@ -2,10 +2,11 @@ import { Card, Divider, Grid } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import LanguageTextArea from "./LanguageTextArea";
+import TranslatorTextField from "./TranslatorTextField";
 import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
-import { supportedLanguages } from "./translate";
+
 import DoneIcon from "@mui/icons-material/Done";
+import { supportedLanguages } from "../../utils/lang";
 
 const StyledCard = styled(Card)`
   color: white;
@@ -152,7 +153,7 @@ export default function Translator() {
     <StyledCard variant="outlined">
       <Grid container rowSpacing={1}>
         <StyledGrid item xs={12}>
-          <LanguageTextArea
+          <TranslatorTextField
             input
             lang={fromLanguage}
             onLangChange={onLanguageSelected}
@@ -169,7 +170,7 @@ export default function Translator() {
 
         {toLanguages.map((lang) => (
           <StyledGrid item xs={12}>
-            <LanguageTextArea
+            <TranslatorTextField
               fromLang={fromLanguage}
               text={textToTranslate}
               lang={lang}

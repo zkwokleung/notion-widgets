@@ -4,6 +4,7 @@ import ErrorPage from "./pages/error/ErrorPage";
 import Translator from "./widgets/translator/Translator";
 import TranslatorInitContextProvider from "./widgets/translator/TranslatorInitContextProvider";
 import TextToSpeech from "./widgets/text-to-speech/TextToSpeech";
+import TextToSpeechInitContextProvider from "./widgets/text-to-speech/TextToSpeechInitContextProvider";
 
 const router = createHashRouter([
   {
@@ -32,6 +33,16 @@ const router = createHashRouter([
   {
     path: "/text-to-speech/:lang/:text",
     element: <TextToSpeech />,
+    errorElement: <ErrorPage />,
+  },
+
+  {
+    path: "/text-to-speech",
+    element: (
+      <TextToSpeechInitContextProvider>
+        <TextToSpeech />
+      </TextToSpeechInitContextProvider>
+    ),
     errorElement: <ErrorPage />,
   },
 ]);

@@ -2,10 +2,12 @@ import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import StyledTextField from "../../components/StyledTextField";
-import LanguageSelect from "./LanguageSelect";
-import { supportedLanguages, translateTo } from "./translate";
+import LanguageSelect from "../../components/LanguageSelect";
+import { translateTo } from "./translatorUitls";
+import { supportedLanguages } from "../../utils/lang";
+import LanguageTextField from "../../components/LanguageTextField";
 
-export interface LanguageTextAreaProps {
+export interface TranslatorTextFieldProps {
   fromLang?: string;
   text?: string;
   lang: string;
@@ -32,11 +34,7 @@ const StyledRemoveButton = styled.div`
   user-select: none;
 `;
 
-function LanguageTextArea(props: LanguageTextAreaProps) {
-  // Responsive UI
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
-
+function TranslatorTextField(props: TranslatorTextFieldProps) {
   // Local state
   const [text, setText] = useState("");
 
@@ -57,33 +55,21 @@ function LanguageTextArea(props: LanguageTextAreaProps) {
 
   return (
     <Grid container columnSpacing={1}>
-      <Grid item xs={isSmallScreen ? 2 : 1.5}>
-        <LanguageSelect
+      <Grid item xs={11.5}>
+        <LanguageTextField
+          text={text}
           availableLangs={
             props.input ? supportedLanguages : props.availableLangs ?? []
           }
           lang={props.lang}
-          onChange={(event) => {
-            if (props.onLangChange) {
-              props.onLangChange?.(event);
-            }
-          }}
-        />
-      </Grid>
-      <Grid item xs={isSmallScreen ? 9.5 : 10}>
-        <StyledTextField
-          id="outlined-multiline-static"
-          multiline
-          rows={1}
           placeholder={props.placeholder ?? "..."}
-          aria-readonly={true}
-          inputProps={{ readOnly: !props.input }}
-          value={text}
-          onChange={(event) => {
-            setText(event.target.value);
-            if (props.onTextChange) {
-              props.onTextChange(event.target.value);
-            }
+          readonlyTextField={!props.input}
+          onLangChange={(event) => {
+            props.onLangChange?.(event);
+          }}
+          onTextChange={(value) => {
+            setText(value);
+            props.onTextChange?.(value);
           }}
         />
       </Grid>
@@ -98,4 +84,4 @@ function LanguageTextArea(props: LanguageTextAreaProps) {
   );
 }
 
-export default LanguageTextArea;
+export default TranslatorTextField;
