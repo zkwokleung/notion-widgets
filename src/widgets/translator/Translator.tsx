@@ -1,10 +1,10 @@
-import { Card, Divider, Grid, useMediaQuery, useTheme } from "@mui/material";
-import { ChangeEvent, useEffect, useState } from "react";
-import { supportedLanguages } from "./translate";
+import { Card, Divider, Grid } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import StyledTextField from "../../components/StyledTextField";
 import LanguageTextArea from "./LanguageTextArea";
-import LanguageSelect from "./LanguageSelect";
+import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
+import { supportedLanguages } from "./translate";
 
 const StyledCard = styled(Card)`
   color: white;
@@ -16,12 +16,49 @@ const StyledGrid = styled(Grid)`
   margin: 1rem;
 `;
 
+const StyledActionButton = styled.div`
+  border: 1px solid rgba(255, 255, 255, 0.23);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.23);
+  padding: 0.2rem 0.5rem;
+  display: flex;
+  justify-content: center;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  user-select: none;
+  cursor: pointer;
+
+  &:hover {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.5);
+  }
+`;
+
+const StyledActionLayout = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
 export default function Translator() {
   // Translator
   const [isTyping, setIsTyping] = useState(false);
   const [text, setText] = useState("");
   const [textToTranslate, setTextToTranslate] = useState("");
-  const [fromLanguage, setFromLanguage] = useState("en" as string);
+
+  // Load the initial languages from the URL search params
+  const { from, to } = useTranslatorInitContext();
+
+  const [fromLanguage, setFromLanguage] = useState(from);
+  const [toLanguages, setToLanguages] = useState(to);
+
+  const [, setSearchParams] = useSearchParams();
+
+  const availableToLanguages = useMemo(() => {
+    return supportedLanguages.filter(
+      (lang) => lang !== fromLanguage && !toLanguages.includes(lang)
+    );
+  }, [fromLanguage, toLanguages]);
 
   const onTextChange = (value: string) => {
     // Delay the translation by 1 second, if the user is still typing, cancel the previous translation
@@ -32,6 +69,57 @@ export default function Translator() {
   const onLanguageSelected = (value: string) => {
     setFromLanguage(value);
   };
+
+  const handleToLangChange = (lang: string, newLang: string) => {
+    console.log(lang, newLang);
+    const newToLanguages = [...toLanguages];
+    const index = newToLanguages.indexOf(lang);
+    if (index > -1) {
+      newToLanguages.splice(index, 1, newLang);
+    }
+
+    setToLanguages(newToLanguages);
+  };
+
+  const handleAddToLang = () => {
+    const newToLanguages = [...toLanguages];
+
+    // Find the unselected to language
+    const unselectedLang = supportedLanguages.find(
+      (lang) => !toLanguages.includes(lang) && lang !== fromLanguage
+    );
+
+    if (!unselectedLang) {
+      alert("No more supported languages to add!");
+      return;
+    }
+
+    newToLanguages.push(unselectedLang);
+    setToLanguages(newToLanguages);
+  };
+
+  const handleRemoveToLang = (lang: string) => {
+    const newToLanguages = [...toLanguages];
+    const index = newToLanguages.indexOf(lang);
+    if (index > -1) {
+      newToLanguages.splice(index, 1);
+    }
+
+    setToLanguages(newToLanguages);
+  };
+
+  const handleCopyParmalink = () => {
+    navigator.clipboard.writeText(document.location.href);
+  };
+
+  useEffect(() => {
+    console.log(fromLanguage, toLanguages);
+    const params = new URLSearchParams();
+    params.set("from", fromLanguage);
+    toLanguages.forEach((lang) => params.append("to", lang));
+
+    setSearchParams(params);
+  }, [fromLanguage, toLanguages, setSearchParams]);
 
   useEffect(() => {
     if (isTyping) {
@@ -53,6 +141,7 @@ export default function Translator() {
         <StyledGrid item xs={12}>
           <LanguageTextArea
             input
+            lang={fromLanguage}
             onLangChange={onLanguageSelected}
             onTextChange={onTextChange}
           />
@@ -64,18 +153,25 @@ export default function Translator() {
           </Divider>
         </StyledGrid>
 
-        {supportedLanguages
-          .filter((lang) => lang !== fromLanguage && lang !== "zh-TW")
-          .map((lang) => (
-            <StyledGrid item xs={12}>
-              <LanguageTextArea
-                fromLang={fromLanguage}
-                text={textToTranslate}
-                defaultLang={lang}
-              />
-            </StyledGrid>
-          ))}
+        {toLanguages.map((lang) => (
+          <StyledGrid item xs={12}>
+            <LanguageTextArea
+              fromLang={fromLanguage}
+              text={textToTranslate}
+              lang={lang}
+              onLangChange={(newLang) => handleToLangChange(lang, newLang)}
+              onRemoveLang={handleRemoveToLang}
+              availableLangs={[...availableToLanguages, lang]}
+            />
+          </StyledGrid>
+        ))}
       </Grid>
+      <StyledActionLayout>
+        <StyledActionButton onClick={handleAddToLang}>+</StyledActionButton>
+        <StyledActionButton onClick={handleCopyParmalink}>
+          Copy Parmalink
+        </StyledActionButton>
+      </StyledActionLayout>
     </StyledCard>
   );
 }
