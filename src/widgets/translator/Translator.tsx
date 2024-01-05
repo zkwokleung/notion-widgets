@@ -7,6 +7,7 @@ import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
 
 import DoneIcon from "@mui/icons-material/Done";
 import { supportedLanguages } from "../../utils/lang";
+import { useDebounce } from "../../utils/hooks";
 
 const StyledCard = styled(Card)`
   color: white;
@@ -44,9 +45,8 @@ const StyledActionLayout = styled.div`
 
 export default function Translator() {
   // Translator
-  const [isTyping, setIsTyping] = useState(false);
   const [text, setText] = useState("");
-  const [textToTranslate, setTextToTranslate] = useState("");
+  const textToTranslate = useDebounce(text, 500);
 
   // Load the initial languages from the URL search params
   const { from, to } = useTranslatorInitContext();
@@ -64,18 +64,15 @@ export default function Translator() {
     );
   }, [fromLanguage, toLanguages]);
 
-  const onTextChange = (value: string) => {
-    // Delay the translation by 1 second, if the user is still typing, cancel the previous translation
-    setIsTyping(true);
+  const handleTextChange = (value: string) => {
     setText(value);
   };
 
-  const onLanguageSelected = (value: string) => {
+  const handleLanguageSelected = (value: string) => {
     setFromLanguage(value);
   };
 
   const handleToLangChange = (lang: string, newLang: string) => {
-    console.log(lang, newLang);
     const newToLanguages = [...toLanguages];
     const index = newToLanguages.indexOf(lang);
     if (index > -1) {
@@ -118,27 +115,12 @@ export default function Translator() {
   };
 
   useEffect(() => {
-    console.log(fromLanguage, toLanguages);
     const params = new URLSearchParams();
     params.set("from", fromLanguage);
     toLanguages.forEach((lang) => params.append("to", lang));
 
     setSearchParams(params);
   }, [fromLanguage, toLanguages, setSearchParams]);
-
-  useEffect(() => {
-    if (isTyping) {
-      const timeout = setTimeout(() => {
-        if (text !== "") {
-          setTextToTranslate(text);
-        } else {
-          setTextToTranslate("");
-        }
-        setIsTyping(false);
-      }, 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [isTyping, text]);
 
   useEffect(() => {
     if (copied) {
@@ -156,8 +138,8 @@ export default function Translator() {
           <TranslatorTextField
             input
             lang={fromLanguage}
-            onLangChange={onLanguageSelected}
-            onTextChange={onTextChange}
+            onLangChange={handleLanguageSelected}
+            onTextChange={handleTextChange}
             placeholder="Type something to translate..."
           />
         </StyledGrid>

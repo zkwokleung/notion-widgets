@@ -31,7 +31,7 @@ const router = createHashRouter([
   },
 
   {
-    path: "/text-to-speech/:lang/:text",
+    path: "/text-to-speech/:lang",
     element: <TextToSpeech />,
     errorElement: <ErrorPage />,
   },

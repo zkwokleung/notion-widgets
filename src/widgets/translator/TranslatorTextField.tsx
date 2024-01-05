@@ -1,11 +1,10 @@
-import { Grid, useMediaQuery, useTheme } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import StyledTextField from "../../components/StyledTextField";
-import LanguageSelect from "../../components/LanguageSelect";
 import { translateTo } from "./translatorUitls";
 import { supportedLanguages } from "../../utils/lang";
 import LanguageTextField from "../../components/LanguageTextField";
+import RemoveButton from "../../components/RemoveButton";
 
 export interface TranslatorTextFieldProps {
   fromLang?: string;
@@ -19,20 +18,6 @@ export interface TranslatorTextFieldProps {
   onTextChange?: (value: string) => void;
   onRemoveLang?: (value: string) => void;
 }
-
-const StyledRemoveButton = styled.div`
-  color: rgba(255, 255, 255, 0.23);
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 1.5rem;
-  user-select: none;
-`;
 
 function TranslatorTextField(props: TranslatorTextFieldProps) {
   // Local state
@@ -75,9 +60,7 @@ function TranslatorTextField(props: TranslatorTextFieldProps) {
       </Grid>
       {!props.input && (
         <Grid item xs={0.5}>
-          <StyledRemoveButton onClick={() => props.onRemoveLang?.(props.lang)}>
-            ×
-          </StyledRemoveButton>
+          <RemoveButton onClick={() => props.onRemoveLang?.(props.lang)} />
         </Grid>
       )}
     </Grid>

@@ -2,19 +2,17 @@ import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { supportedLanguages } from "../utils/lang";
 import LanguageSelect from "./LanguageSelect";
-import StyledTextField from "./StyledTextField";
+import { StyledTextField } from "./StyledComponents";
 
 export interface LanguageTextFieldProps {
   text?: string;
   lang?: string;
   placeholder?: string;
   availableLangs?: string[];
-
   readonlyTextField?: boolean;
 
   onLangChange?: (value: string) => void;
   onTextChange?: (value: string) => void;
-  onRemove?: (props: LanguageTextFieldProps) => void;
 }
 
 function LanguageTextField(props: LanguageTextFieldProps) {
