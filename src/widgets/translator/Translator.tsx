@@ -8,6 +8,11 @@ import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
 import DoneIcon from "@mui/icons-material/Done";
 import { supportedLanguages } from "../../utils/lang";
 import { useDebounce } from "../../utils/hooks";
+import {
+  StyledActionLayout,
+  StyledActionButton,
+} from "../../components/StyledComponents";
+import CopyParamalinkButton from "../../components/CopyParamalinkButton";
 
 const StyledCard = styled(Card)`
   color: white;
@@ -17,30 +22,6 @@ const StyledCard = styled(Card)`
 
 const StyledGrid = styled(Grid)`
   margin: 1rem;
-`;
-
-const StyledActionButton = styled.div`
-  border: 1px solid rgba(255, 255, 255, 0.23);
-  border-radius: 4px;
-  color: rgba(255, 255, 255, 0.23);
-  padding: 0.2rem 0.5rem;
-  display: flex;
-  justify-content: center;
-  font-size: 1rem;
-  margin-top: 0.5rem;
-  user-select: none;
-  cursor: pointer;
-
-  &:hover {
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    color: rgba(255, 255, 255, 0.5);
-  }
-`;
-
-const StyledActionLayout = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
 `;
 
 export default function Translator() {
@@ -165,13 +146,7 @@ export default function Translator() {
       </Grid>
       <StyledActionLayout>
         <StyledActionButton onClick={handleAddToLang}>+</StyledActionButton>
-        <StyledActionButton onClick={handleCopyParmalink}>
-          {copied ? (
-            <DoneIcon fontSize="small" color="success" />
-          ) : (
-            "Copy Parmalink"
-          )}
-        </StyledActionButton>
+        <CopyParamalinkButton />
       </StyledActionLayout>
     </StyledCard>
   );

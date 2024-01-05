@@ -3,11 +3,7 @@ import { IconButton } from "@mui/material";
 import { getTextToSpeechURL } from "./textToSpeechUtils";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
-import styled from "styled-components";
-
-const StyledIconButton = styled(IconButton)`
-  min-width: 100%;
-`;
+import PendingIcon from "@mui/icons-material/Pending";
 
 export interface SpeechPlayerProps {
   lang: string;
@@ -17,12 +13,19 @@ export interface SpeechPlayerProps {
 function SpeechPlayer(props: SpeechPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!audioRef.current) return;
 
     const audio = audioRef.current;
+    const onPlaying = () => {
+      setLoading(false);
+      setPlaying(true);
+    };
     const onEnded = () => setPlaying(false);
+
+    audio.addEventListener("playing", onPlaying);
     audio.addEventListener("ended", onEnded);
 
     return () => {
@@ -37,27 +40,35 @@ function SpeechPlayer(props: SpeechPlayerProps) {
 
   return (
     <>
-      {!playing ? (
-        <StyledIconButton
+      {!playing && !loading && (
+        <IconButton
           onClick={() => {
             if (audioRef.current) {
               audioRef.current.currentTime = 0;
               audioRef.current.play();
-              setPlaying(true);
+              setLoading(true);
             }
           }}
         >
           <PlayCircleIcon color="primary" style={iconStyle} />
-        </StyledIconButton>
-      ) : (
-        <StyledIconButton
+        </IconButton>
+      )}
+
+      {loading && (
+        <IconButton>
+          <PendingIcon color="primary" style={iconStyle} />
+        </IconButton>
+      )}
+
+      {playing && (
+        <IconButton
           onClick={() => {
             audioRef.current?.pause();
             setPlaying(false);
           }}
         >
           <StopCircleIcon color="primary" style={iconStyle} />
-        </StyledIconButton>
+        </IconButton>
       )}
 
       {props.lang && props.text && (

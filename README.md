@@ -7,6 +7,9 @@ The widgets are written with React in Typescript, deployed to github.io with [gh
 ## Available Widgets
 
 * [Multi-Language translator](https://zkwokleung.github.io/notion-widgets/#/translator)
+* Text-to-Speech word list (2 versions)
+    * [Set language for each word](https://zkwokleung.github.io/notion-widgets/#/translator)
+    * [Set language for all words](https://zkwokleung.github.io/notion-widgets/#/translator) (change the lang in url)
 
 ## Usage
 

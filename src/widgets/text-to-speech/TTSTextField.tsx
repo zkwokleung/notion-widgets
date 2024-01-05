@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid } from "@mui/material";
+import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import LanguageTextField from "../../components/LanguageTextField";
 import SpeechPlayer from "./SpeechPlayer";
 import { StyledTextField } from "../../components/StyledComponents";
@@ -17,6 +17,9 @@ export interface TTSTextFieldProps {
 }
 
 function TTSTextField(props: TTSTextFieldProps) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
+
   const handleLangChange = (value: string) => {
     props.onLanguageSelected?.(value, props.id);
   };
@@ -27,9 +30,10 @@ function TTSTextField(props: TTSTextFieldProps) {
 
   return (
     <Grid container columnSpacing={1}>
-      <Grid item xs={11.5}>
+      <Grid item xs={isSmallScreen ? 11 : 11.5}>
         {props.fixedLang ? (
           <StyledTextField
+            value={props.text}
             color="primary"
             fullWidth
             multiline
@@ -48,7 +52,7 @@ function TTSTextField(props: TTSTextFieldProps) {
           />
         )}
       </Grid>
-      <Grid item xs={0.5}>
+      <Grid item xs={isSmallScreen ? 1 : 0.5}>
         <SpeechPlayer lang={props.lang} text={props.text} />
       </Grid>
     </Grid>
