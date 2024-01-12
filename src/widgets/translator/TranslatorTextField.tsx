@@ -1,6 +1,5 @@
 import { Grid } from "@mui/material";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
 import { translateTo } from "./translatorUitls";
 import { supportedLanguages } from "../../utils/lang";
 import LanguageTextField from "../../components/LanguageTextField";
@@ -36,7 +35,7 @@ function TranslatorTextField(props: TranslatorTextFieldProps) {
         setText("");
       }
     }
-  }, [props.text, props.fromLang, props.lang]);
+  }, [props.text, props.fromLang, props.lang, props.input]);
 
   return (
     <Grid container columnSpacing={1}>

@@ -1,10 +1,12 @@
 import React from "react";
-import TranslateIcon from "@mui/icons-material/Translate";
-import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import WidgetCard from "./WidgetCard";
 import AutoLayout from "../../components/AutoLayout";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import styled from "styled-components";
+
+import TranslateIcon from "@mui/icons-material/Translate";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import BookIcon from "@mui/icons-material/Book";
 
 const StyledBody = styled.div`
   display: flex;
@@ -25,6 +27,11 @@ export const widgetsData = [
     title: "Text-to-Speech",
     link: "/text-to-speech",
     avatar: <VolumeUpIcon />,
+  },
+  {
+    title: "Dictionary",
+    link: "/dictionary",
+    avatar: <BookIcon />,
   },
 ];
 

@@ -5,6 +5,8 @@ import Translator from "./widgets/translator/Translator";
 import TranslatorInitContextProvider from "./widgets/translator/TranslatorInitContextProvider";
 import TextToSpeech from "./widgets/text-to-speech/TextToSpeech";
 import TextToSpeechInitContextProvider from "./widgets/text-to-speech/TextToSpeechInitContextProvider";
+import Dictionary from "./widgets/dictionary/Dictionary";
+import DictionaryInitContextProvider from "./widgets/dictionary/DictionaryInitContextProvider";
 
 const router = createHashRouter([
   {
@@ -46,6 +48,25 @@ const router = createHashRouter([
       <TextToSpeechInitContextProvider>
         <TextToSpeech />
       </TextToSpeechInitContextProvider>
+    ),
+    errorElement: <ErrorPage />,
+  },
+
+  {
+    path: "/dictionary",
+    element: (
+      <DictionaryInitContextProvider>
+        <Dictionary />
+      </DictionaryInitContextProvider>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/dictionary/:from/:to",
+    element: (
+      <DictionaryInitContextProvider>
+        <Dictionary />
+      </DictionaryInitContextProvider>
     ),
     errorElement: <ErrorPage />,
   },

@@ -5,9 +5,8 @@ import styled from "styled-components";
 import TranslatorTextField from "./TranslatorTextField";
 import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
 
-import DoneIcon from "@mui/icons-material/Done";
 import { supportedLanguages } from "../../utils/lang";
-import { useDebounce } from "../../utils/hooks";
+import { useDebounce } from "../../hooks/useDebounce";
 import {
   StyledActionLayout,
   StyledActionButton,
@@ -88,11 +87,6 @@ export default function Translator() {
     }
 
     setToLanguages(newToLanguages);
-  };
-
-  const handleCopyParmalink = () => {
-    navigator.clipboard.writeText(document.location.href);
-    setCopied(true);
   };
 
   useEffect(() => {

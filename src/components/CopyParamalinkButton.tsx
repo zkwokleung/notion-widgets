@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { StyledActionButton } from "./StyledComponents";
 import DoneIcon from "@mui/icons-material/Done";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Typography } from "@mui/material";
 
 function CopyParamalinkButton() {
   const [copied, setCopied] = useState(false);
@@ -14,7 +16,9 @@ function CopyParamalinkButton() {
       {copied ? (
         <DoneIcon fontSize="small" color="success" />
       ) : (
-        "Copy Parmalink"
+        <>
+          <ContentCopyIcon /> <Typography>Copy Parmalink</Typography>
+        </>
       )}
     </StyledActionButton>
   );
