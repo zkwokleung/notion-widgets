@@ -61,15 +61,6 @@ const router = createHashRouter([
     ),
     errorElement: <ErrorPage />,
   },
-  {
-    path: "/dictionary/:from/:to",
-    element: (
-      <DictionaryInitContextProvider>
-        <Dictionary />
-      </DictionaryInitContextProvider>
-    ),
-    errorElement: <ErrorPage />,
-  },
 ]);
 
 export default router;

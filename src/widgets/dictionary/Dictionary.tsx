@@ -8,8 +8,11 @@ import { useDictionaryInitContext } from "./DictionaryInitContextProvider";
 import { useSearchParams } from "react-router-dom";
 import CopyParamalinkButton from "../../components/CopyParamalinkButton";
 import DictEntry from "./DictEntry";
-
-export interface DictionaryProps {}
+import AddIcon from "@mui/icons-material/Add";
+import OptionsButton from "../../components/OptionsButton";
+import { Box } from "@mui/material";
+import AutoLayout from "../../components/AutoLayout";
+import DictOptionMenu from "./DictOptionMenu";
 
 function Dictionary() {
   const { fixedFrom, fixedTo, words: initWords } = useDictionaryInitContext();
@@ -17,16 +20,10 @@ function Dictionary() {
 
   const [, setSearchParams] = useSearchParams();
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    words.forEach((word) => {
-      params.append("from", word.from);
-      params.append("to", word.to);
-      params.append("text", word.text);
-    });
-    setSearchParams(params);
-  }, [words, setSearchParams]);
+  // Menus
+  const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
 
+  // Event Handlers
   function handleFromChange(value: string, id: number): void {
     const newWords = [...words];
     newWords[id].from = value;
@@ -55,6 +52,25 @@ function Dictionary() {
     setWords([...words, { from: "fr", to: "en", text: "" }]);
   }
 
+  function handleOptionsButtonClick(): void {
+    setOptionsMenuOpen(true);
+  }
+
+  function handleOptionMenuClose(): void {
+    setOptionsMenuOpen(false);
+  }
+
+  // UseEffects
+  useEffect(() => {
+    const params = new URLSearchParams();
+    words.forEach((word) => {
+      params.append("from", word.from);
+      params.append("to", word.to);
+      params.append("text", word.text);
+    });
+    setSearchParams(params);
+  }, [words, setSearchParams]);
+
   return (
     <>
       <StyledCard>
@@ -73,11 +89,18 @@ function Dictionary() {
         ))}
         <StyledActionLayout>
           <StyledActionButton onClick={handleAddButtonClick}>
-            +
+            <AddIcon />
           </StyledActionButton>
-          <CopyParamalinkButton />
+          <Box sx={{ marginLeft: "auto" }}>
+            <AutoLayout>
+              <OptionsButton onClick={handleOptionsButtonClick} />
+              <CopyParamalinkButton />
+            </AutoLayout>
+          </Box>
         </StyledActionLayout>
       </StyledCard>
+
+      <DictOptionMenu open={optionsMenuOpen} onClose={handleOptionMenuClose} />
     </>
   );
 }

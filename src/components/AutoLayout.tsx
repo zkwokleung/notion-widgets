@@ -3,8 +3,6 @@ import React from "react";
 import styled from "styled-components";
 
 const StyledGrid = styled(Grid)`
-  padding: 10px;
-  margin: 10px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -12,13 +10,21 @@ const StyledGrid = styled(Grid)`
 `;
 
 export interface AutoLayoutProps {
+  direction?: "row" | "column";
   children?: React.ReactNode;
+  sx?: any;
 }
 
 function AutoLayout(props: AutoLayoutProps) {
   return (
     <>
-      <StyledGrid container rowSpacing={3} columnSpacing={2}>
+      <StyledGrid
+        container
+        rowSpacing={3}
+        columnSpacing={2}
+        direction={props.direction ?? "row"}
+        sx={props.sx}
+      >
         {React.Children.map(props.children, (child) => {
           return <Grid item>{child}</Grid>;
         })}

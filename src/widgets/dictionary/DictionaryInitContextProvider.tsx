@@ -2,8 +2,8 @@ import { createContext, useContext } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 
 interface DictionaryInitContextReturn {
-  fixedFrom?: string;
-  fixedTo?: string;
+  fixedFrom?: string | null;
+  fixedTo?: string | null;
   words: { from: string; to: string; text: string }[];
 }
 
@@ -20,14 +20,10 @@ const DictionaryInitContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  // URL Params
-  const { from: fixedFrom, to: fixedTo } = useParams<{
-    from: string;
-    to: string;
-  }>();
-
   // Search Params
   const [search] = useSearchParams();
+  const _fixedFrom = search.get("fixedFrom");
+  const _fixedTo = search.get("fixedTo");
   const _froms = search.getAll("from");
   const _tos = search.getAll("to");
   const _texts = search.getAll("text");
@@ -35,16 +31,16 @@ const DictionaryInitContextProvider = ({
   const words = [
     ...new Set(
       _texts.map((t, i) => ({
-        from: _froms[i] ?? "fr",
-        to: _tos[i] ?? "en",
+        from: _fixedFrom || (_froms[i] ?? "fr"),
+        to: _fixedTo || (_tos[i] ?? "en"),
         text: t,
       }))
     ),
   ];
 
   const ctx: DictionaryInitContextReturn = {
-    fixedFrom,
-    fixedTo,
+    fixedFrom: _fixedFrom,
+    fixedTo: _fixedTo,
     words,
   };
 

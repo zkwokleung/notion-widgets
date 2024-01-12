@@ -1,5 +1,7 @@
+import { Typography } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
+import CloseIcon from "@mui/icons-material/Close";
 
 const StyledRemoveButton = styled.div`
   color: rgba(255, 255, 255, 0.23);
@@ -20,7 +22,11 @@ interface RemoveButtonProps {
 }
 
 function RemoveButton(props: RemoveButtonProps) {
-  return <StyledRemoveButton onClick={props.onClick}>×</StyledRemoveButton>;
+  return (
+    <StyledRemoveButton onClick={props.onClick}>
+      <CloseIcon />
+    </StyledRemoveButton>
+  );
 }
 
 export default RemoveButton;

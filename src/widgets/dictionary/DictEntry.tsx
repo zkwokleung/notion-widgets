@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import LanguageSelect from "../../components/LanguageSelect";
 import { StyledTextField } from "../../components/StyledComponents";
 import SpeechPlayer from "../text-to-speech/SpeechPlayer";
@@ -32,6 +32,9 @@ function DictEntry(props: DictEntryProps) {
   const textToTranslate = useDebounce(text, 1000);
   const [translatedText, setTranslatedText] = useState("");
 
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
+
   const handleFromChange = (value: string) => {
     setFrom(value);
     props.onFromChange?.(value, props.index);
@@ -63,7 +66,7 @@ function DictEntry(props: DictEntryProps) {
   }, [textToTranslate, from, to]);
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={1}>
       {!props.fixedLang && (
         <>
           <Grid item xs={1.5}>
@@ -82,20 +85,20 @@ function DictEntry(props: DictEntryProps) {
           </Grid>
         </>
       )}
-      <Grid item xs={3.5}>
+      <Grid item xs={isSmallScreen ? 3.25 : 3.5}>
         <StyledTextField
           fullWidth
           value={text}
           onChange={(e) => handleTextChange(e.target.value)}
         />
       </Grid>
-      <Grid item xs={0.5}>
+      <Grid item xs={isSmallScreen ? 1 : 0.5}>
         <SpeechPlayer lang={props.from} text={props.text} />
       </Grid>
-      <Grid item xs={3.5}>
+      <Grid item xs={isSmallScreen ? 3.25 : 3.5}>
         <StyledTextField disabled fullWidth value={translatedText} />
       </Grid>
-      <Grid item xs={0.5}>
+      <Grid item xs={isSmallScreen ? 1 : 0.5}>
         <SpeechPlayer lang={props.to} text={translatedText} />
       </Grid>
       <Grid item xs={0.5}>
