@@ -21,7 +21,7 @@ function Dictionary() {
     words: initWords,
   } = useDictionaryInitContext();
 
-  const [fixedLang, setFixedLang] = useState(false);
+  const [fixedLang, setFixedLang] = useState(!!initFixedFrom && !!initFixedTo);
   const [fixedFrom, setFixedFrom] = useState(initFixedFrom);
   const [fixedTo, setFixedTo] = useState(initFixedTo);
   const [words, setWords] = useState(initWords);
