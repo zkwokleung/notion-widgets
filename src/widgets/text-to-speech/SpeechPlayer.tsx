@@ -41,7 +41,6 @@ function SpeechPlayer(props: SpeechPlayerProps) {
   });
 
   const iconStyle = {
-    width: "100%",
     height: "100%",
   };
 
