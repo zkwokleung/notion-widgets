@@ -9,12 +9,20 @@ interface MenuDialogProps {
   title?: string | React.ReactNode;
 
   children?: React.ReactNode;
+
+  maxWidth?: "xs" | "sm" | "md" | "lg" | "xl" | false;
+  fullWidth?: boolean;
 }
 
 function MenuDialog(props: MenuDialogProps) {
   return (
     <>
-      <Dialog open={props.open} onClose={props.onClose}>
+      <Dialog
+        open={props.open}
+        onClose={props.onClose}
+        maxWidth={props.maxWidth || "lg"}
+        fullWidth={props.fullWidth}
+      >
         {props.title && (
           <DialogTitle sx={{ m: 0, p: 2 }}>
             <Typography>{props.title}</Typography>

@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 interface DictionaryInitContextReturn {
   fixedFrom?: string | null;
@@ -31,8 +31,8 @@ const DictionaryInitContextProvider = ({
   const words = [
     ...new Set(
       _texts.map((t, i) => ({
-        from: _fixedFrom || (_froms[i] ?? "fr"),
-        to: _fixedTo || (_tos[i] ?? "en"),
+        from: _froms[i],
+        to: _tos[i],
         text: t,
       }))
     ),

@@ -15,7 +15,15 @@ import AutoLayout from "../../components/AutoLayout";
 import DictOptionMenu from "./DictOptionMenu";
 
 function Dictionary() {
-  const { fixedFrom, fixedTo, words: initWords } = useDictionaryInitContext();
+  const {
+    fixedFrom: initFixedFrom,
+    fixedTo: initFixedTo,
+    words: initWords,
+  } = useDictionaryInitContext();
+
+  const [fixedLang, setFixedLang] = useState(false);
+  const [fixedFrom, setFixedFrom] = useState(initFixedFrom);
+  const [fixedTo, setFixedTo] = useState(initFixedTo);
   const [words, setWords] = useState(initWords);
 
   const [, setSearchParams] = useSearchParams();
@@ -52,6 +60,7 @@ function Dictionary() {
     setWords([...words, { from: "fr", to: "en", text: "" }]);
   }
 
+  // * Options Menu
   function handleOptionsButtonClick(): void {
     setOptionsMenuOpen(true);
   }
@@ -60,16 +69,52 @@ function Dictionary() {
     setOptionsMenuOpen(false);
   }
 
-  // UseEffects
+  function handleOptionMenuFixedLangChange(value: boolean): void {
+    setFixedLang(value);
+    console.log(value);
+    if (value) {
+      if (!fixedFrom) {
+        setFixedFrom("fr");
+      }
+      if (!fixedTo) {
+        setFixedTo("en");
+      }
+    } else {
+      setWords(
+        words.map((word) => {
+          return { ...word, from: "fr", to: "en" };
+        })
+      );
+    }
+  }
+
+  function handleOptionMenuFromChange(value: string): void {
+    setFixedFrom(value);
+  }
+
+  function handleOptionMenuToChange(value: string): void {
+    setFixedTo(value);
+  }
+
+  // * UseEffects
+  // Search Params
   useEffect(() => {
     const params = new URLSearchParams();
+
+    if (fixedLang) {
+      params.append("fixedFrom", fixedFrom || "");
+      params.append("fixedTo", fixedTo || "");
+    }
+
     words.forEach((word) => {
-      params.append("from", word.from);
-      params.append("to", word.to);
+      if (!fixedLang) {
+        params.append("from", word.from);
+        params.append("to", word.to);
+      }
       params.append("text", word.text);
     });
     setSearchParams(params);
-  }, [words, setSearchParams]);
+  }, [words, setSearchParams, fixedLang, fixedFrom, fixedTo]);
 
   return (
     <>
@@ -77,10 +122,10 @@ function Dictionary() {
         {words.map((word, i) => (
           <DictEntry
             index={i}
-            from={fixedFrom || word.from}
-            to={fixedTo || word.to}
+            from={fixedLang && fixedFrom ? fixedFrom : word.from}
+            to={fixedLang && fixedTo ? fixedTo : word.to}
             text={word.text}
-            fixedLang={!!fixedFrom && !!fixedTo}
+            fixedLang={fixedLang}
             onFromChange={handleFromChange}
             onToChange={handleToChange}
             onTextChange={handleTextChange}
@@ -100,7 +145,16 @@ function Dictionary() {
         </StyledActionLayout>
       </StyledCard>
 
-      <DictOptionMenu open={optionsMenuOpen} onClose={handleOptionMenuClose} />
+      <DictOptionMenu
+        open={optionsMenuOpen}
+        onClose={handleOptionMenuClose}
+        fixedLang={fixedLang}
+        from={fixedFrom}
+        to={fixedTo}
+        onFixedLangChange={handleOptionMenuFixedLangChange}
+        onFromChange={handleOptionMenuFromChange}
+        onToChange={handleOptionMenuToChange}
+      />
     </>
   );
 }

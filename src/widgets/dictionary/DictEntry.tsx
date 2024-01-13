@@ -25,8 +25,6 @@ export interface DictEntryProps {
 }
 
 function DictEntry(props: DictEntryProps) {
-  const [from, setFrom] = useState(props.from);
-  const [to, setTo] = useState(props.to);
   const [text, setText] = useState(props.text);
 
   const textToTranslate = useDebounce(text, 1000);
@@ -36,12 +34,10 @@ function DictEntry(props: DictEntryProps) {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
 
   const handleFromChange = (value: string) => {
-    setFrom(value);
     props.onFromChange?.(value, props.index);
   };
 
   const handleToChange = (value: string) => {
-    setTo(value);
     props.onToChange?.(value, props.index);
   };
 
@@ -56,14 +52,14 @@ function DictEntry(props: DictEntryProps) {
 
   // Translation
   useEffect(() => {
-    if (textToTranslate && from && to) {
-      translateTo(textToTranslate, from, to).then((res) => {
+    if (textToTranslate && props.from && props.to) {
+      translateTo(textToTranslate, props.from, props.to).then((res) => {
         setTranslatedText(res);
       });
     } else {
       setTranslatedText("");
     }
-  }, [textToTranslate, from, to]);
+  }, [textToTranslate, props.from, props.to, props.fixedLang]);
 
   return (
     <Grid container spacing={1}>
@@ -71,21 +67,25 @@ function DictEntry(props: DictEntryProps) {
         <>
           <Grid item xs={1.5}>
             <LanguageSelect
-              lang={from}
+              lang={props.from}
               availableLangs={props.availableLangs}
               onChange={handleFromChange}
             />
           </Grid>
           <Grid item xs={1.5}>
             <LanguageSelect
-              lang={to}
+              lang={props.to}
               availableLangs={props.availableLangs}
               onChange={handleToChange}
             />
           </Grid>
         </>
       )}
-      <Grid item xs={isSmallScreen ? 3.25 : 3.5}>
+
+      <Grid
+        item
+        xs={(isSmallScreen ? 3.25 : 3.75) + 1.5 * (props.fixedLang ? 1 : 0)}
+      >
         <StyledTextField
           fullWidth
           value={text}
@@ -95,12 +95,17 @@ function DictEntry(props: DictEntryProps) {
       <Grid item xs={isSmallScreen ? 1 : 0.5}>
         <SpeechPlayer lang={props.from} text={props.text} />
       </Grid>
-      <Grid item xs={isSmallScreen ? 3.25 : 3.5}>
+
+      <Grid
+        item
+        xs={(isSmallScreen ? 3.25 : 3.75) + 1.5 * (props.fixedLang ? 1 : 0)}
+      >
         <StyledTextField disabled fullWidth value={translatedText} />
       </Grid>
       <Grid item xs={isSmallScreen ? 1 : 0.5}>
         <SpeechPlayer lang={props.to} text={translatedText} />
       </Grid>
+
       <Grid item xs={0.5}>
         <RemoveButton onClick={handleRemoveButtonClick} />
       </Grid>
