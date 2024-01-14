@@ -2,6 +2,8 @@ import { createContext, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
 
 interface DictionaryInitContextReturn {
+  hideOriginTTSBtn?: boolean;
+  hideTranslatedTTSBtn?: boolean;
   fixedFrom?: string | null;
   fixedTo?: string | null;
   words: { from: string; to: string; text: string }[];
@@ -27,6 +29,8 @@ const DictionaryInitContextProvider = ({
   const _froms = search.getAll("from");
   const _tos = search.getAll("to");
   const _texts = search.getAll("text");
+  const _hideOriginTTSBtn = search.get("hotb");
+  const _hideTranslatedTTSBtn = search.get("httb");
 
   const words = [
     ...new Set(
@@ -39,6 +43,8 @@ const DictionaryInitContextProvider = ({
   ];
 
   const ctx: DictionaryInitContextReturn = {
+    hideOriginTTSBtn: _hideOriginTTSBtn === "true",
+    hideTranslatedTTSBtn: _hideTranslatedTTSBtn === "true",
     fixedFrom: _fixedFrom,
     fixedTo: _fixedTo,
     words,

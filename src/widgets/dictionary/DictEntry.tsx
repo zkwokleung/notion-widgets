@@ -14,6 +14,9 @@ export interface DictEntryProps {
   to: string;
   text: string;
 
+  hideOriginTTSButton?: boolean;
+  hideTranslatedTTSButton?: boolean;
+
   availableLangs?: string[];
   fixedLang?: boolean;
 
@@ -25,14 +28,18 @@ export interface DictEntryProps {
 }
 
 function DictEntry(props: DictEntryProps) {
+  // Data
   const [text, setText] = useState(props.text);
-
   const textToTranslate = useDebounce(text, 1000);
   const [translatedText, setTranslatedText] = useState("");
 
+  // UI
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
+  const [originTextFieldSz, setOriginTextFieldSz] = useState(3.75);
+  const [translatedTextFieldSz, setTranslatedTextFieldSz] = useState(3.75);
 
+  // * Handlers
   const handleFromChange = (value: string) => {
     props.onFromChange?.(value, props.index);
   };
@@ -50,6 +57,7 @@ function DictEntry(props: DictEntryProps) {
     props.onRemove?.(props.index);
   }
 
+  // * UseEffects
   // Translation
   useEffect(() => {
     if (textToTranslate && props.from && props.to) {
@@ -60,6 +68,23 @@ function DictEntry(props: DictEntryProps) {
       setTranslatedText("");
     }
   }, [textToTranslate, props.from, props.to, props.fixedLang]);
+
+  // TextField Size
+  useEffect(() => {
+    setOriginTextFieldSz(
+      (isSmallScreen ? 3.25 : 3.75) +
+        (props.fixedLang ? 1.5 : 0) +
+        (props.hideOriginTTSButton ? (isSmallScreen ? 1 : 0.5) : 0)
+    );
+  }, [isSmallScreen, props.fixedLang, props.hideOriginTTSButton]);
+
+  useEffect(() => {
+    setTranslatedTextFieldSz(
+      (isSmallScreen ? 3.25 : 3.75) +
+        (props.fixedLang ? 1.5 : 0) +
+        (props.hideTranslatedTTSButton ? (isSmallScreen ? 1 : 0.5) : 0)
+    );
+  }, [isSmallScreen, props.fixedLang, props.hideTranslatedTTSButton]);
 
   return (
     <Grid container spacing={1}>
@@ -82,29 +107,27 @@ function DictEntry(props: DictEntryProps) {
         </>
       )}
 
-      <Grid
-        item
-        xs={(isSmallScreen ? 3.25 : 3.75) + 1.5 * (props.fixedLang ? 1 : 0)}
-      >
+      <Grid item xs={originTextFieldSz}>
         <StyledTextField
           fullWidth
           value={text}
           onChange={(e) => handleTextChange(e.target.value)}
         />
       </Grid>
-      <Grid item xs={isSmallScreen ? 1 : 0.5}>
-        <SpeechPlayer lang={props.from} text={props.text} />
-      </Grid>
+      {!props.hideOriginTTSButton && (
+        <Grid item xs={isSmallScreen ? 1 : 0.5}>
+          <SpeechPlayer lang={props.from} text={props.text} />
+        </Grid>
+      )}
 
-      <Grid
-        item
-        xs={(isSmallScreen ? 3.25 : 3.75) + 1.5 * (props.fixedLang ? 1 : 0)}
-      >
+      <Grid item xs={translatedTextFieldSz}>
         <StyledTextField disabled fullWidth value={translatedText} />
       </Grid>
-      <Grid item xs={isSmallScreen ? 1 : 0.5}>
-        <SpeechPlayer lang={props.to} text={translatedText} />
-      </Grid>
+      {!props.hideTranslatedTTSButton && (
+        <Grid item xs={isSmallScreen ? 1 : 0.5}>
+          <SpeechPlayer lang={props.to} text={translatedText} />
+        </Grid>
+      )}
 
       <Grid item xs={0.5}>
         <RemoveButton onClick={handleRemoveButtonClick} />

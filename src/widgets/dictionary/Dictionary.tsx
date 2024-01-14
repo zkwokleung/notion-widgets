@@ -16,6 +16,8 @@ import DictOptionMenu from "./DictOptionMenu";
 
 function Dictionary() {
   const {
+    hideOriginTTSBtn: initHideOriginTTSBtn,
+    hideTranslatedTTSBtn: initHideTranslatedBrn,
     fixedFrom: initFixedFrom,
     fixedTo: initFixedTo,
     words: initWords,
@@ -30,6 +32,11 @@ function Dictionary() {
 
   // Menus
   const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
+  const [hideOriginTTSBtn, setHideOriginTTSBtn] =
+    useState(initHideOriginTTSBtn);
+  const [hideTranslatedTTSBtn, setHideTranslatedTTSbtn] = useState(
+    initHideTranslatedBrn
+  );
 
   // Event Handlers
   function handleFromChange(value: string, id: number): void {
@@ -69,6 +76,14 @@ function Dictionary() {
     setOptionsMenuOpen(false);
   }
 
+  function handleOptionMenuOriginTTSBtnDisplayChange(value: boolean): void {
+    setHideOriginTTSBtn(value);
+  }
+
+  function handleOptionMenuTranslatedTTSBtnDisplayChange(value: boolean): void {
+    setHideTranslatedTTSbtn(value);
+  }
+
   function handleOptionMenuFixedLangChange(value: boolean): void {
     setFixedLang(value);
     console.log(value);
@@ -106,6 +121,14 @@ function Dictionary() {
       params.append("fixedTo", fixedTo || "");
     }
 
+    if (hideOriginTTSBtn) {
+      params.append("hotb", "true");
+    }
+
+    if (hideTranslatedTTSBtn) {
+      params.append("httb", "true");
+    }
+
     words.forEach((word) => {
       if (!fixedLang) {
         params.append("from", word.from);
@@ -114,7 +137,15 @@ function Dictionary() {
       params.append("text", word.text);
     });
     setSearchParams(params);
-  }, [words, setSearchParams, fixedLang, fixedFrom, fixedTo]);
+  }, [
+    words,
+    setSearchParams,
+    fixedLang,
+    fixedFrom,
+    fixedTo,
+    hideOriginTTSBtn,
+    hideTranslatedTTSBtn,
+  ]);
 
   return (
     <>
@@ -122,6 +153,8 @@ function Dictionary() {
         {words.map((word, i) => (
           <DictEntry
             index={i}
+            hideOriginTTSButton={hideOriginTTSBtn}
+            hideTranslatedTTSButton={hideTranslatedTTSBtn}
             from={fixedLang && fixedFrom ? fixedFrom : word.from}
             to={fixedLang && fixedTo ? fixedTo : word.to}
             text={word.text}
@@ -149,8 +182,12 @@ function Dictionary() {
         open={optionsMenuOpen}
         onClose={handleOptionMenuClose}
         fixedLang={fixedLang}
+        showOriginTTSBtn={hideOriginTTSBtn}
+        showTranslatedTTSBtn={hideTranslatedTTSBtn}
         from={fixedFrom}
         to={fixedTo}
+        onTTSOriginChange={handleOptionMenuOriginTTSBtnDisplayChange}
+        onTTSAfterChange={handleOptionMenuTranslatedTTSBtnDisplayChange}
         onFixedLangChange={handleOptionMenuFixedLangChange}
         onFromChange={handleOptionMenuFromChange}
         onToChange={handleOptionMenuToChange}

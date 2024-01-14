@@ -7,6 +7,8 @@ import {
 
 export interface LanguageSelectProps {
   lang: string;
+  alwaysShowLabel?: boolean;
+
   availableLangs?: string[];
   onChange: (value: string) => void;
 }
@@ -27,7 +29,8 @@ function LanguageSelect(props: LanguageSelectProps) {
     >
       {(props.availableLangs || supportedLanguages).map((language) => (
         <MenuItem value={language}>
-          {!isSmallScreen && langCodeToLanguageName(language)}{" "}
+          {(props.alwaysShowLabel || !isSmallScreen) &&
+            langCodeToLanguageName(language)}{" "}
           {langCodeToFlag(language)}
         </MenuItem>
       ))}
