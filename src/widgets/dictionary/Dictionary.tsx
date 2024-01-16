@@ -10,7 +10,7 @@ import CopyParamalinkButton from "../../components/CopyParamalinkButton";
 import DictEntry from "./DictEntry";
 import AddIcon from "@mui/icons-material/Add";
 import OptionsButton from "../../components/OptionsButton";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import AutoLayout from "../../components/AutoLayout";
 import DictOptionMenu from "./DictOptionMenu";
 
@@ -150,21 +150,23 @@ function Dictionary() {
   return (
     <>
       <StyledCard>
-        {words.map((word, i) => (
-          <DictEntry
-            index={i}
-            hideOriginTTSButton={hideOriginTTSBtn}
-            hideTranslatedTTSButton={hideTranslatedTTSBtn}
-            from={fixedLang && fixedFrom ? fixedFrom : word.from}
-            to={fixedLang && fixedTo ? fixedTo : word.to}
-            text={word.text}
-            fixedLang={fixedLang}
-            onFromChange={handleFromChange}
-            onToChange={handleToChange}
-            onTextChange={handleTextChange}
-            onRemove={handleRemoveButtonClick}
-          />
-        ))}
+        <Stack direction="column" spacing={2}>
+          {words.map((word, i) => (
+            <DictEntry
+              index={i}
+              hideOriginTTSButton={hideOriginTTSBtn}
+              hideTranslatedTTSButton={hideTranslatedTTSBtn}
+              from={fixedLang && fixedFrom ? fixedFrom : word.from}
+              to={fixedLang && fixedTo ? fixedTo : word.to}
+              text={word.text}
+              fixedLang={fixedLang}
+              onFromChange={handleFromChange}
+              onToChange={handleToChange}
+              onTextChange={handleTextChange}
+              onRemove={handleRemoveButtonClick}
+            />
+          ))}
+        </Stack>
         <StyledActionLayout>
           <StyledActionButton onClick={handleAddButtonClick}>
             <AddIcon />
