@@ -123,7 +123,6 @@ function WidgetBuilderPage({ widget }: { widget: RegisteredWidget }) {
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
-            <p className="text-xs text-muted-foreground">Auto follows the viewer's system theme.</p>
           </div>
 
           <div className="flex items-center justify-between gap-4">
@@ -155,14 +154,9 @@ function WidgetBuilderPage({ widget }: { widget: RegisteredWidget }) {
             <section aria-label="Embed links" className="flex flex-col gap-4">
               <LinkField
                 label="Embed link (can edit)"
-                hint="Anyone with the editable link can change this widget — keep it private."
                 url={savedWidgetUrl(created.id, created.editKey, display)}
               />
-              <LinkField
-                label="Read-only link"
-                hint="Share this one with others; they can use the widget but not change it."
-                url={savedWidgetUrl(created.id, undefined, display)}
-              />
+              <LinkField label="Read-only link" url={savedWidgetUrl(created.id, undefined, display)} />
               <p className="rounded-lg bg-muted p-3 text-muted-foreground">
                 In Notion, type /embed, paste the link, and resize the block.
               </p>

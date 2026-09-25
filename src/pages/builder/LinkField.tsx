@@ -5,11 +5,10 @@ import CopyLinkButton from "@/components/widget/CopyLinkButton";
 
 interface LinkFieldProps {
   label: string;
-  hint: string;
   url: string;
 }
 
-function LinkField({ label, hint, url }: LinkFieldProps) {
+function LinkField({ label, url }: LinkFieldProps) {
   const id = useId();
 
   return (
@@ -25,7 +24,6 @@ function LinkField({ label, hint, url }: LinkFieldProps) {
         />
         <CopyLinkButton label="Copy" url={url} variant="outline" />
       </div>
-      <p className="text-xs text-muted-foreground">{hint}</p>
     </div>
   );
 }

@@ -169,11 +169,6 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
               if (hasTarget) update({ target: encodeTarget(toLocalInput(targetMs), on) });
             }}
           />
-          <p className="text-xs text-muted-foreground">
-            {shared
-              ? "Viewers in other time zones see it end at the same instant."
-              : "Ends at this wall-clock time in each viewer's own time zone."}
-          </p>
           <Choice
             label="When it ends"
             value={config.afterEnd}
