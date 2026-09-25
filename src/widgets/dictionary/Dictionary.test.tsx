@@ -22,7 +22,7 @@ describe("Dictionary", () => {
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({ json: () => Promise.resolve([[["x"]]]) })
+      vi.fn(() => Promise.resolve(Response.json({ text: "x" })))
     );
   });
 

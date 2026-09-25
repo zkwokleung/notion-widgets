@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["vite/client"],
-    "jsx": "react-jsx",
+    "types": ["./worker-configuration.d.ts", "node"],
     "noEmit": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
@@ -17,8 +16,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "shared", ".storybook/*.ts", ".storybook/*.tsx"]
+  "include": ["worker", "shared"]
 }

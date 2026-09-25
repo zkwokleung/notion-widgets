@@ -10,16 +10,26 @@ export default defineConfig([
   globalIgnores(["dist", "storybook-static", ".wrangler", "worker-configuration.d.ts"]),
   {
     files: ["**/*.{ts,tsx}"],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
+    extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: 2023,
-      globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
+    rules: {
+      "@typescript-eslint/no-floating-promises": "error",
+    },
+  },
+  {
+    files: ["src/**/*.{ts,tsx}", ".storybook/**/*.{ts,tsx}"],
+    extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
+    languageOptions: { globals: globals.browser },
+  },
+  {
+    files: ["worker/**/*.ts"],
+    languageOptions: { globals: globals.serviceworker },
   },
   storybook.configs["flat/recommended"],
 ]);

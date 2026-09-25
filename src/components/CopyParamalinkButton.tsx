@@ -10,9 +10,13 @@ function CopyParamalinkButton() {
   const [copied, setCopied] = useState(false);
 
   const handleCopyParmalink = () => {
-    navigator.clipboard.writeText(document.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(document.location.href).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      },
+      () => setCopied(false)
+    );
   };
   return (
     <StyledActionButton onClick={handleCopyParmalink}>

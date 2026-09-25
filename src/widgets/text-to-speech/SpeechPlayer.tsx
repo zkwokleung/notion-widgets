@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState } from "react";
 import { Box, IconButton, Stack } from "@mui/material";
-import { getTextToSpeechURL } from "./textToSpeechUtils";
 import {
   PlayCircle as PlayCircleIcon,
   StopCircle as StopCircleIcon,
   Pending as PendingIcon,
 } from "@mui/icons-material";
 import styled from "styled-components";
+import { useSpeech } from "../../hooks/useSpeech";
 
 const StyledIconButton = styled(IconButton)`
   width: 100%;
@@ -20,36 +19,7 @@ export interface SpeechPlayerProps {
 }
 
 function SpeechPlayer(props: SpeechPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const hasAudio = !!props.lang && !!props.text;
-
-  // <audio> only mounts once there is text; re-attach when it appears.
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const onPlaying = () => {
-      setLoading(false);
-      setPlaying(true);
-    };
-    const onStopped = () => {
-      setLoading(false);
-      setPlaying(false);
-    };
-
-    audio.addEventListener("playing", onPlaying);
-    audio.addEventListener("ended", onStopped);
-    audio.addEventListener("error", onStopped);
-
-    return () => {
-      audio.removeEventListener("playing", onPlaying);
-      audio.removeEventListener("ended", onStopped);
-      audio.removeEventListener("error", onStopped);
-    };
-  }, [hasAudio]);
+  const { status, speak, stop } = useSpeech();
 
   const iconStyle = {
     height: "100%",
@@ -61,42 +31,26 @@ function SpeechPlayer(props: SpeechPlayerProps) {
         <Box flex={1}></Box>
         <Stack direction="row">
           <Box flex={1}></Box>
-          {!playing && !loading && (
+          {status === "idle" && (
             <StyledIconButton
-              onClick={() => {
-                if (audioRef.current) {
-                  audioRef.current.currentTime = 0;
-                  setLoading(true);
-                  audioRef.current.play().catch(() => setLoading(false));
-                }
-              }}
+              aria-label="Play"
+              disabled={!props.text}
+              onClick={() => void speak(props.text, props.lang)}
             >
               <PlayCircleIcon style={iconStyle} />
             </StyledIconButton>
           )}
 
-          {loading && (
-            <StyledIconButton>
+          {status === "loading" && (
+            <StyledIconButton aria-label="Loading" onClick={stop}>
               <PendingIcon style={iconStyle} />
             </StyledIconButton>
           )}
 
-          {playing && (
-            <StyledIconButton
-              onClick={() => {
-                audioRef.current?.pause();
-                setPlaying(false);
-              }}
-            >
+          {status === "playing" && (
+            <StyledIconButton aria-label="Stop" onClick={stop}>
               <StopCircleIcon style={iconStyle} />
             </StyledIconButton>
-          )}
-
-          {hasAudio && (
-            <audio
-              src={getTextToSpeechURL(props.lang, props.text)}
-              ref={audioRef}
-            />
           )}
           <Box flex={1}></Box>
         </Stack>
