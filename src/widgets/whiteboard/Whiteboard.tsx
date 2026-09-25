@@ -84,9 +84,7 @@ function Whiteboard({ config, onChange }: WidgetProps<WhiteboardConfig>) {
       </div>
 
       <div className="flex min-h-9 flex-wrap items-center gap-1" aria-live="polite" aria-label="Suggestions">
-        {strokes.length === 0 ? (
-          <span className="text-xs text-muted-foreground">Suggestions appear as you write.</span>
-        ) : isError ? (
+        {strokes.length === 0 ? null : isError ? (
           <span className="text-xs text-destructive">Couldn't recognize that. Try again.</span>
         ) : !candidates ? (
           <span className="text-xs text-muted-foreground">Recognizing…</span>

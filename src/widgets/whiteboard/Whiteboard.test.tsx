@@ -52,7 +52,7 @@ describe("Whiteboard", () => {
 
     expect(screen.getByLabelText("Written text")).toHaveValue("十");
     expect(await screen.findByText("ten")).toBeInTheDocument();
-    expect(screen.getByText("Suggestions appear as you write.")).toBeInTheDocument();
+    expect(screen.getByLabelText("Suggestions")).toBeEmptyDOMElement();
   });
 
   it("never offers the previous drawing's suggestions for a new one", async () => {
@@ -71,7 +71,7 @@ describe("Whiteboard", () => {
   it("undoes strokes and deletes characters", async () => {
     drawStroke(screen.getByRole("img", { name: "Handwriting area" }));
     await userEvent.click(screen.getByRole("button", { name: "Undo stroke" }));
-    expect(screen.getByText("Suggestions appear as you write.")).toBeInTheDocument();
+    expect(screen.getByLabelText("Suggestions")).toBeEmptyDOMElement();
 
     await userEvent.type(screen.getByLabelText("Written text"), "水の");
     await userEvent.click(screen.getByRole("button", { name: "Delete last character" }));

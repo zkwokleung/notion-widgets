@@ -207,8 +207,7 @@ function DictionarySettings({
         {studied && (
           <>
             <Separator />
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-muted-foreground">Study progress is saved per word.</span>
+            <div className="flex justify-end">
               <Button type="button" size="sm" variant="destructive" onClick={onResetProgress}>
                 Reset progress
               </Button>

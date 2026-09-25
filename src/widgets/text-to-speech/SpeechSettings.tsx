@@ -57,7 +57,9 @@ function SpeechSettings({ config, onChange }: SpeechSettingsProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Speech settings</DialogTitle>
-          <DialogDescription>Applies to every entry in this list.</DialogDescription>
+          <DialogDescription className="sr-only">
+            Choose a language and speech speed for every entry in this list.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-3">
