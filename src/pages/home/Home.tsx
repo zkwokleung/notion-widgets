@@ -54,6 +54,7 @@ function Home() {
             {widgetsData.map((widget) => {
               return (
                 <WidgetCard
+                  key={widget.link}
                   title={widget.title}
                   link={widget.link}
                   avatar={widget.avatar}

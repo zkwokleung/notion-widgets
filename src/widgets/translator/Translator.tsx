@@ -106,7 +106,7 @@ export default function Translator() {
         </StyledGrid>
 
         {toLanguages.map((lang) => (
-          <StyledGrid item xs={12}>
+          <StyledGrid item xs={12} key={lang}>
             <TranslatorTextField
               fromLang={fromLanguage}
               text={textToTranslate}

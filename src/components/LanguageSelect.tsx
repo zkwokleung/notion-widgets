@@ -28,7 +28,7 @@ function LanguageSelect(props: LanguageSelectProps) {
       IconComponent={isVerySmallScreen ? () => null : undefined}
     >
       {(props.availableLangs || supportedLanguages).map((language) => (
-        <MenuItem value={language}>
+        <MenuItem key={language} value={language}>
           {(props.alwaysShowLabel || !isSmallScreen) &&
             langCodeToLanguageName(language)}{" "}
           {langCodeToFlag(language)}
