@@ -56,6 +56,7 @@ bun run test:e2e   # Playwright against the production build, desktop + narrow
 bun run typecheck  # tsc -b across app, worker and config projects
 bun run lint
 bun run storybook
+bun run icons      # regenerate favicon.ico and the PNG icons from public/favicon.svg
 ```
 
 `bun run dev` runs the Worker in the real Cloudflare runtime with local KV, so saved
