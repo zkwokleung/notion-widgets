@@ -60,14 +60,19 @@ function DictEntry(props: DictEntryProps) {
   // * UseEffects
   // Translation
   useEffect(() => {
-    if (textToTranslate && props.from && props.to) {
-      translateTo(textToTranslate, props.from, props.to).then((res) => {
-        setTranslatedText(res);
-      });
-    } else {
+    if (!textToTranslate || !props.from || !props.to) {
       setTranslatedText("");
+      return;
     }
-  }, [textToTranslate, props.from, props.to, props.fixedLang]);
+
+    const controller = new AbortController();
+    translateTo(textToTranslate, props.from, props.to, controller.signal)
+      .then(setTranslatedText)
+      .catch((error) => {
+        if (error.name !== "AbortError") throw error;
+      });
+    return () => controller.abort();
+  }, [textToTranslate, props.from, props.to]);
 
   // TextField Size
   useEffect(() => {

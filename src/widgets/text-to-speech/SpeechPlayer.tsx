@@ -22,23 +22,32 @@ function SpeechPlayer(props: SpeechPlayerProps) {
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!audioRef.current) return;
+  const hasAudio = !!props.lang && !!props.text;
 
+  // <audio> only mounts once there is text; re-attach when it appears.
+  useEffect(() => {
     const audio = audioRef.current;
+    if (!audio) return;
+
     const onPlaying = () => {
       setLoading(false);
       setPlaying(true);
     };
-    const onEnded = () => setPlaying(false);
+    const onStopped = () => {
+      setLoading(false);
+      setPlaying(false);
+    };
 
     audio.addEventListener("playing", onPlaying);
-    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("ended", onStopped);
+    audio.addEventListener("error", onStopped);
 
     return () => {
-      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("playing", onPlaying);
+      audio.removeEventListener("ended", onStopped);
+      audio.removeEventListener("error", onStopped);
     };
-  });
+  }, [hasAudio]);
 
   const iconStyle = {
     height: "100%",
@@ -55,8 +64,8 @@ function SpeechPlayer(props: SpeechPlayerProps) {
               onClick={() => {
                 if (audioRef.current) {
                   audioRef.current.currentTime = 0;
-                  audioRef.current.play();
                   setLoading(true);
+                  audioRef.current.play().catch(() => setLoading(false));
                 }
               }}
             >
@@ -81,7 +90,7 @@ function SpeechPlayer(props: SpeechPlayerProps) {
             </StyledIconButton>
           )}
 
-          {props.lang && props.text && (
+          {hasAudio && (
             <audio
               src={getTextToSpeechURL(props.lang, props.text)}
               ref={audioRef}

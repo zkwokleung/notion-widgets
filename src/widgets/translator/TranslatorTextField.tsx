@@ -23,18 +23,20 @@ function TranslatorTextField(props: TranslatorTextFieldProps) {
   const [text, setText] = useState("");
 
   useEffect(() => {
-    if (props.input) {
-      // Behaviors for input
-    } else {
-      // Behaviors for output
-      if (props.text && props.fromLang && props.text !== "") {
-        translateTo(props.text, props.fromLang, props.lang).then((res) => {
-          setText(res);
-        });
-      } else {
-        setText("");
-      }
+    if (props.input) return;
+
+    if (!props.text || !props.fromLang) {
+      setText("");
+      return;
     }
+
+    const controller = new AbortController();
+    translateTo(props.text, props.fromLang, props.lang, controller.signal)
+      .then(setText)
+      .catch((error) => {
+        if (error.name !== "AbortError") throw error;
+      });
+    return () => controller.abort();
   }, [props.text, props.fromLang, props.lang, props.input]);
 
   return (
