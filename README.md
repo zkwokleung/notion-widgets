@@ -45,20 +45,20 @@ Links from the previous GitHub Pages version (`#/translator?...`, `#/text-to-spe
 
 ## Development
 
-Requires Node 24 and pnpm 10.
+Requires [Bun](https://bun.sh) 1.3+ and Node 24 (Vite, Vitest and Wrangler run on Node).
 
 ```bash
-pnpm install
-pnpm dev          # app + Worker API (workerd) at http://localhost:5173
-pnpm test         # Vitest: app (jsdom) and worker (node) projects
-pnpm test:e2e     # Playwright against the production build, desktop + narrow
-pnpm typecheck    # tsc -b across app, worker and config projects
-pnpm lint
-pnpm storybook
+bun install
+bun run dev        # app + Worker API (workerd) at http://localhost:5173
+bun run test       # Vitest: app (jsdom) and worker (node) projects
+bun run test:e2e   # Playwright against the production build, desktop + narrow
+bun run typecheck  # tsc -b across app, worker and config projects
+bun run lint
+bun run storybook
 ```
 
-`pnpm dev` runs the Worker in the real Cloudflare runtime with local KV, so saved
-widgets work offline. After changing `wrangler.jsonc`, run `pnpm cf-typegen`.
+`bun run dev` runs the Worker in the real Cloudflare runtime with local KV, so saved
+widgets work offline. After changing `wrangler.jsonc`, run `bun run cf-typegen`.
 
 ### Layout
 
@@ -85,8 +85,8 @@ The app is a single Cloudflare Worker that serves the static build and the `/api
 routes.
 
 ```bash
-pnpm exec wrangler login
-pnpm deploy
+bunx wrangler login
+bun run deploy
 ```
 
 The `WIDGETS` KV namespace is created automatically on the first deploy. Edge caching

@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   // The production build served by workerd, with the Worker API and local KV.
   webServer: {
-    command: `pnpm build && pnpm preview --port ${PORT} --strictPort`,
+    command: `bun run build && bun run preview --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
