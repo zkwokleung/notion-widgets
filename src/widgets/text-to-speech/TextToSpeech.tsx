@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { useTextToSpeechInitContext } from "./TextToSpeechInitContextProvider";
+import {
+  SpeechText,
+  useTextToSpeechInitContext,
+} from "./TextToSpeechInitContextProvider";
 import { Grid } from "@mui/material";
 import TTSTextField from "./TTSTextField";
 import {
@@ -17,22 +20,27 @@ function TextToSpeech() {
 
   const [, setSearchParams] = useSearchParams();
 
-  const handleLanguageSelected = (value: string, id: number) => {
-    const newSpeechTexts = [...speechTexts];
-    newSpeechTexts[id].lang = value;
-    setSpeechTexts(newSpeechTexts);
+  const updateSpeechText = (index: number, patch: Partial<SpeechText>) => {
+    setSpeechTexts((prev) =>
+      prev.map((speechText, i) =>
+        i === index ? { ...speechText, ...patch } : speechText
+      )
+    );
   };
 
-  const handleTextChange = (value: string, id: number) => {
-    const newSpeechTexts = [...speechTexts];
-    newSpeechTexts[id].text = value;
-    setSpeechTexts(newSpeechTexts);
+  const handleLanguageSelected = (value: string, index: number) => {
+    updateSpeechText(index, { lang: value });
+  };
+
+  const handleTextChange = (value: string, index: number) => {
+    updateSpeechText(index, { text: value });
   };
 
   const handleAddSpeech = () => {
-    setSpeechTexts([
-      ...speechTexts,
+    setSpeechTexts((prev) => [
+      ...prev,
       {
+        id: crypto.randomUUID(),
         lang: fixedLang ?? "en",
         text: "",
       },
@@ -57,7 +65,7 @@ function TextToSpeech() {
     <StyledCard variant="outlined">
       <Grid container rowSpacing={1}>
         {speechTexts.map((speechText, idx) => (
-          <Grid item xs={12}>
+          <Grid item xs={12} key={speechText.id}>
             <TTSTextField
               id={idx}
               lang={fixedLang ?? speechText.lang}

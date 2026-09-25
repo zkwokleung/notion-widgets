@@ -1,16 +1,23 @@
 import { createContext, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
 
+export interface DictWord {
+  id: string;
+  from: string;
+  to: string;
+  text: string;
+}
+
 interface DictionaryInitContextReturn {
   hideOriginTTSBtn?: boolean;
   hideTranslatedTTSBtn?: boolean;
   fixedFrom?: string | null;
   fixedTo?: string | null;
-  words: { from: string; to: string; text: string }[];
+  words: DictWord[];
 }
 
 const DictionaryInitContext = createContext<DictionaryInitContextReturn>({
-  words: [{ from: "fr", to: "en", text: "eau" }],
+  words: [{ id: crypto.randomUUID(), from: "fr", to: "en", text: "eau" }],
 });
 
 export function useDictionaryInitContext() {
@@ -32,15 +39,12 @@ const DictionaryInitContextProvider = ({
   const _hideOriginTTSBtn = search.get("hotb");
   const _hideTranslatedTTSBtn = search.get("httb");
 
-  const words = [
-    ...new Set(
-      _texts.map((t, i) => ({
-        from: _froms[i],
-        to: _tos[i],
-        text: t,
-      }))
-    ),
-  ];
+  const words: DictWord[] = _texts.map((t, i) => ({
+    id: crypto.randomUUID(),
+    from: _froms[i],
+    to: _tos[i],
+    text: t,
+  }));
 
   const ctx: DictionaryInitContextReturn = {
     hideOriginTTSBtn: _hideOriginTTSBtn === "true",

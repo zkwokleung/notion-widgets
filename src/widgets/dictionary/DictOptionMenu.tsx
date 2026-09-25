@@ -39,15 +39,15 @@ export interface DictOptionMenuProps {
   open: boolean;
   onClose: () => void;
 
-  showOriginTTSBtn?: boolean;
-  showTranslatedTTSBtn?: boolean;
+  hideOriginTTSBtn?: boolean;
+  hideTranslatedTTSBtn?: boolean;
 
   fixedLang?: boolean;
   from?: string | null;
   to?: string | null;
 
-  onTTSOriginChange?: (value: boolean) => void;
-  onTTSAfterChange?: (value: boolean) => void;
+  onHideOriginTTSBtnChange?: (value: boolean) => void;
+  onHideTranslatedTTSBtnChange?: (value: boolean) => void;
 
   onFixedLangChange?: (value: boolean) => void;
   onFromChange?: (value: string) => void;
@@ -77,15 +77,15 @@ function DictOptionMenu(props: DictOptionMenuProps) {
         fullWidth
       >
         <Stack direction="column" spacing={2}>
-          {/* Show speech button */}
+          {/* Hide speech buttons */}
           <Typography>Hide text-to-speech button for:</Typography>
           <FormControl>
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={props.showOriginTTSBtn}
+                  checked={props.hideOriginTTSBtn}
                   onChange={(event) => {
-                    props.onTTSOriginChange?.(event.target.checked);
+                    props.onHideOriginTTSBtnChange?.(event.target.checked);
                   }}
                 />
               }
@@ -96,9 +96,9 @@ function DictOptionMenu(props: DictOptionMenuProps) {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={props.showTranslatedTTSBtn}
+                  checked={props.hideTranslatedTTSBtn}
                   onChange={(event) => {
-                    props.onTTSAfterChange?.(event.target.checked);
+                    props.onHideTranslatedTTSBtnChange?.(event.target.checked);
                   }}
                 />
               }

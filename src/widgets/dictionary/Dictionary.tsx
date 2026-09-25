@@ -4,7 +4,10 @@ import {
   StyledActionLayout,
   StyledCard,
 } from "../../components/StyledComponents";
-import { useDictionaryInitContext } from "./DictionaryInitContextProvider";
+import {
+  DictWord,
+  useDictionaryInitContext,
+} from "./DictionaryInitContextProvider";
 import { useSearchParams } from "react-router-dom";
 import CopyParamalinkButton from "../../components/CopyParamalinkButton";
 import DictEntry from "./DictEntry";
@@ -39,32 +42,33 @@ function Dictionary() {
   );
 
   // Event Handlers
-  function handleFromChange(value: string, id: number): void {
-    const newWords = [...words];
-    newWords[id].from = value;
-    setWords(newWords);
+  function updateWord(index: number, patch: Partial<DictWord>): void {
+    setWords((prev) =>
+      prev.map((word, i) => (i === index ? { ...word, ...patch } : word))
+    );
   }
 
-  function handleToChange(value: string, id: number): void {
-    const newWords = [...words];
-    newWords[id].to = value;
-    setWords(newWords);
+  function handleFromChange(value: string, index: number): void {
+    updateWord(index, { from: value });
   }
 
-  function handleTextChange(value: string, id: number): void {
-    const newWords = [...words];
-    newWords[id].text = value;
-    setWords(newWords);
+  function handleToChange(value: string, index: number): void {
+    updateWord(index, { to: value });
   }
 
-  function handleRemoveButtonClick(id: number): void {
-    const newWords = [...words];
-    newWords.splice(id, 1);
-    setWords(newWords);
+  function handleTextChange(value: string, index: number): void {
+    updateWord(index, { text: value });
+  }
+
+  function handleRemoveButtonClick(index: number): void {
+    setWords((prev) => prev.filter((_, i) => i !== index));
   }
 
   function handleAddButtonClick(): void {
-    setWords([...words, { from: "fr", to: "en", text: "" }]);
+    setWords((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), from: "fr", to: "en", text: "" },
+    ]);
   }
 
   // * Options Menu
@@ -152,6 +156,7 @@ function Dictionary() {
         <Stack direction="column" spacing={2}>
           {words.map((word, i) => (
             <DictEntry
+              key={word.id}
               index={i}
               hideOriginTTSButton={hideOriginTTSBtn}
               hideTranslatedTTSButton={hideTranslatedTTSBtn}
@@ -183,12 +188,14 @@ function Dictionary() {
         open={optionsMenuOpen}
         onClose={handleOptionMenuClose}
         fixedLang={fixedLang}
-        showOriginTTSBtn={hideOriginTTSBtn}
-        showTranslatedTTSBtn={hideTranslatedTTSBtn}
+        hideOriginTTSBtn={hideOriginTTSBtn}
+        hideTranslatedTTSBtn={hideTranslatedTTSBtn}
         from={fixedFrom}
         to={fixedTo}
-        onTTSOriginChange={handleOptionMenuOriginTTSBtnDisplayChange}
-        onTTSAfterChange={handleOptionMenuTranslatedTTSBtnDisplayChange}
+        onHideOriginTTSBtnChange={handleOptionMenuOriginTTSBtnDisplayChange}
+        onHideTranslatedTTSBtnChange={
+          handleOptionMenuTranslatedTTSBtnDisplayChange
+        }
         onFixedLangChange={handleOptionMenuFixedLangChange}
         onFromChange={handleOptionMenuFromChange}
         onToChange={handleOptionMenuToChange}
