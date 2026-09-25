@@ -59,6 +59,50 @@ export const whiteboardConfigSchema = z.object({
   text: z.string().max(500).default(""),
 });
 
+export const COUNTDOWN_FONTS = ["system", "serif", "mono", "display", "rounded", "script"] as const;
+export const COUNTDOWN_COLORS = [
+  "default",
+  "gray",
+  "brown",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "pink",
+  "red",
+] as const;
+
+// ISO 8601 date-time: with a Z or offset it is one instant for every viewer; without,
+// Date.parse reads it as the viewer's local wall-clock time.
+const isoDateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?$/;
+const hexColor = /^#[0-9a-f]{6}$/i;
+
+export const countdownConfigSchema = z.object({
+  title: z.string().max(80).default("New Year"),
+  target: z
+    .string()
+    .regex(isoDateTime)
+    .refine((value) => !Number.isNaN(Date.parse(value)), "Not a valid date")
+    .default(() => `${new Date().getFullYear() + 1}-01-01T00:00`),
+  doneMessage: z.string().max(120).default("It's time!"),
+  afterEnd: z.enum(["message", "countUp"]).default("message"),
+  layout: z.enum(["tiles", "plain", "inline"]).default("tiles"),
+  precision: z.enum(["days", "hours", "minutes", "seconds"]).default("seconds"),
+  labels: z.enum(["long", "short", "none"]).default("long"),
+  padZero: z.boolean().default(true),
+  size: z.enum(["sm", "md", "lg"]).default("md"),
+  font: z.enum(COUNTDOWN_FONTS).default("system"),
+  /** A preset name or a #rrggbb colour. */
+  color: z
+    .string()
+    .refine(
+      (value) => (COUNTDOWN_COLORS as readonly string[]).includes(value) || hexColor.test(value),
+      "Not a colour"
+    )
+    .default("default"),
+});
+
 export type TranslatorConfig = z.infer<typeof translatorConfigSchema>;
 export type SpeechEntry = z.infer<typeof speechEntrySchema>;
 export type TextToSpeechConfig = z.infer<typeof textToSpeechConfigSchema>;
@@ -67,6 +111,9 @@ export type DictWord = z.infer<typeof dictWordSchema>;
 export type DictionaryConfig = z.infer<typeof dictionaryConfigSchema>;
 export type TimerConfig = z.infer<typeof timerConfigSchema>;
 export type WhiteboardConfig = z.infer<typeof whiteboardConfigSchema>;
+export type CountdownConfig = z.infer<typeof countdownConfigSchema>;
+export type CountdownFont = (typeof COUNTDOWN_FONTS)[number];
+export type CountdownColor = (typeof COUNTDOWN_COLORS)[number];
 
 export const widgetConfigSchemas = {
   translator: translatorConfigSchema,
@@ -74,6 +121,7 @@ export const widgetConfigSchemas = {
   dictionary: dictionaryConfigSchema,
   timer: timerConfigSchema,
   whiteboard: whiteboardConfigSchema,
+  countdown: countdownConfigSchema,
 } satisfies Record<WidgetType, z.ZodType>;
 
 export type WidgetConfigMap = {
@@ -86,6 +134,7 @@ export const createWidgetBodySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("dictionary"), config: dictionaryConfigSchema }),
   z.object({ type: z.literal("timer"), config: timerConfigSchema }),
   z.object({ type: z.literal("whiteboard"), config: whiteboardConfigSchema }),
+  z.object({ type: z.literal("countdown"), config: countdownConfigSchema }),
 ]);
 
 export const updateWidgetBodySchema = z.object({ config: z.unknown() });

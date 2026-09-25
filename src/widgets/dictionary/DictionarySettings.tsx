@@ -12,10 +12,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import LanguagePicker from "@/components/widget/LanguagePicker";
+import SettingSwitch from "@/components/widget/SettingSwitch";
 import type { DictionaryConfig } from "../../../shared/widgetConfigs";
 
 type LangPair = NonNullable<DictionaryConfig["fixedLang"]>;
@@ -31,26 +31,6 @@ interface DictionarySettingsProps {
   onImport: (text: string) => number;
   onExport: () => Promise<void>;
   onResetProgress: () => void;
-}
-
-function SettingSwitch({
-  label,
-  checked,
-  onCheckedChange,
-}: {
-  label: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-}) {
-  const id = useId();
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <Label htmlFor={id} className="font-normal">
-        {label}
-      </Label>
-      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
-    </div>
-  );
 }
 
 function DictionarySettings({

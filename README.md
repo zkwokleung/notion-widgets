@@ -11,6 +11,7 @@ re-copied after you edit it.
 | **Dictionary** | A vocabulary list with live translations, pronunciation, spaced-repetition flashcards (SM-2), Play all, and CSV import/export. |
 | **Focus Timer** | A Pomodoro timer (focus / short break / long break) that survives Notion reloading the embed. |
 | **Handwriting** | Draw characters you can't type yet (kanji, hanzi, hangul…), then translate and hear them. |
+| **Countdown** | Count down to a date (or up from it), with your choice of layout, units, font, size and colour. |
 
 ## Embedding in Notion
 

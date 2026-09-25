@@ -1,4 +1,4 @@
-import { BookOpen, Languages, PenLine, Timer as TimerIcon, Volume2 } from "lucide-react";
+import { BookOpen, CalendarClock, Languages, PenLine, Timer as TimerIcon, Volume2 } from "lucide-react";
 import { lazy, type ComponentType } from "react";
 import type { z } from "zod";
 import type { WidgetType } from "../../shared/api";
@@ -78,6 +78,14 @@ export const widgetDefinitions: RegisteredWidget[] = [
     Icon: PenLine,
     schema: widgetConfigSchemas.whiteboard,
     Component: lazy(() => import("./whiteboard/Whiteboard")),
+  }),
+  defineWidget({
+    type: "countdown",
+    title: "Countdown",
+    description: "Count down to a date, in your own style.",
+    Icon: CalendarClock,
+    schema: widgetConfigSchemas.countdown,
+    Component: lazy(() => import("./countdown/Countdown")),
   }),
 ];
 

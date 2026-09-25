@@ -30,7 +30,7 @@ test.beforeEach(async ({ page }) => {
 
 test("home lists every widget and links to its builder", async ({ page }) => {
   await page.goto("/");
-  for (const title of ["Translator", "Text-to-Speech", "Dictionary", "Focus Timer", "Handwriting"]) {
+  for (const title of ["Translator", "Text-to-Speech", "Dictionary", "Focus Timer", "Handwriting", "Countdown"]) {
     await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
   }
   await page.getByRole("link", { name: /Dictionary/ }).click();
@@ -110,6 +110,22 @@ test("handwriting turns strokes into text", async ({ page }) => {
 
   await page.getByRole("button", { name: "十" }).click();
   await expect(page.getByRole("textbox", { name: "Written text", exact: true })).toHaveValue("十");
+});
+
+test("countdown counts down to its date and can be restyled", async ({ page }) => {
+  // Two days and ninety minutes out, so the hours and minutes are predictable.
+  const target = new Date(Date.now() + 2 * 86_400_000 + 90 * 60_000).toISOString();
+  const config = Buffer.from(JSON.stringify({ target, title: "Launch" })).toString("base64url");
+  await page.goto(`/countdown?c=${config}`);
+
+  await expect(page.getByRole("heading", { name: "Launch" })).toBeVisible();
+  await expect(page.getByRole("timer")).toContainText(/2\s*Days/);
+
+  await page.getByRole("button", { name: "Countdown settings" }).click();
+  await page.getByRole("radio", { name: "Inline" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("timer")).toHaveText(/^2 Days 01 Hour 29 Minutes \d\d Seconds$/);
+  await expect(page).toHaveURL(/\/countdown\?c=/);
 });
 
 test("display options apply the theme and transparency", async ({ page }) => {
