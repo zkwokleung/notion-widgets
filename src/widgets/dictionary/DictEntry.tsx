@@ -22,6 +22,7 @@ export interface DictEntryProps {
   showTranslationSpeech: boolean;
   readOnly: boolean;
   autoFocus: boolean;
+  playing?: boolean;
   onFromChange: (from: string) => void;
   onToChange: (to: string) => void;
   onTextChange: (text: string) => void;
@@ -39,6 +40,7 @@ function DictEntry({
   showTranslationSpeech,
   readOnly,
   autoFocus,
+  playing = false,
   onFromChange,
   onToChange,
   onTextChange,
@@ -59,8 +61,10 @@ function DictEntry({
 
   return (
     <li
+      aria-current={playing || undefined}
       className={cn(
-        "grid items-center gap-x-1 gap-y-0.5 py-1.5",
+        "grid items-center gap-x-1 gap-y-0.5 rounded-sm py-1.5 transition-colors",
+        playing && "bg-accent",
         showLanguages
           ? "grid-cols-[minmax(0,1fr)_auto] [grid-template-areas:'langs_langs'_'word_remove'_'trans_.'] @lg:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] @lg:[grid-template-areas:'langs_word_trans_remove']"
           : "grid-cols-[minmax(0,1fr)_auto] [grid-template-areas:'word_remove'_'trans_.'] @lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] @lg:[grid-template-areas:'word_trans_remove']"

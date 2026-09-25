@@ -1,5 +1,5 @@
-import { useId } from "react";
-import { Settings2 } from "lucide-react";
+import { useId, useRef, useState } from "react";
+import { Download, FileUp, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import LanguagePicker from "@/components/widget/LanguagePicker";
 import type { DictionaryConfig } from "../../../shared/widgetConfigs";
@@ -26,6 +27,10 @@ interface DictionarySettingsProps {
   onFixedLangToggle: (enabled: boolean) => void;
   onFixedLangChange: (pair: LangPair) => void;
   onRateChange: (rate: number) => void;
+  /** Returns how many words were added. */
+  onImport: (text: string) => number;
+  onExport: () => Promise<void>;
+  onResetProgress: () => void;
 }
 
 function SettingSwitch({
@@ -55,8 +60,16 @@ function DictionarySettings({
   onFixedLangToggle,
   onFixedLangChange,
   onRateChange,
+  onImport,
+  onExport,
+  onResetProgress,
 }: DictionarySettingsProps) {
   const speedLabelId = useId();
+  const importId = useId();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [importText, setImportText] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const studied = config.words.some((word) => word.review);
   const { fixedLang } = config;
 
   return (
@@ -82,7 +95,7 @@ function DictionarySettings({
         <DialogHeader>
           <DialogTitle>Dictionary options</DialogTitle>
           <DialogDescription className="sr-only">
-            Choose languages, listen buttons and speech speed.
+            Choose languages, listen buttons, speech speed, and import or export words.
           </DialogDescription>
         </DialogHeader>
 
@@ -150,6 +163,78 @@ function DictionarySettings({
             }}
           />
         </section>
+
+        <Separator />
+
+        <section className="flex flex-col gap-2">
+          <Label htmlFor={importId}>Import words</Label>
+          <Textarea
+            id={importId}
+            rows={3}
+            value={importText}
+            onChange={(event) => setImportText(event.target.value)}
+            placeholder={"One word per line, or CSV/TSV:\nword,translation,from,to"}
+            className="text-sm"
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              disabled={!importText.trim()}
+              onClick={() => {
+                if (onImport(importText) > 0) setImportText("");
+              }}
+            >
+              Add words
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => fileInput.current?.click()}
+            >
+              <FileUp />
+              From file…
+            </Button>
+            <input
+              ref={fileInput}
+              type="file"
+              accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (file) void file.text().then(onImport);
+              }}
+            />
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="ml-auto"
+              disabled={exporting || config.words.length === 0}
+              onClick={() => {
+                setExporting(true);
+                void onExport().finally(() => setExporting(false));
+              }}
+            >
+              <Download />
+              Export CSV
+            </Button>
+          </div>
+        </section>
+
+        {studied && (
+          <>
+            <Separator />
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-sm text-muted-foreground">Study progress is saved per word.</span>
+              <Button type="button" size="sm" variant="destructive" onClick={onResetProgress}>
+                Reset progress
+              </Button>
+            </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
