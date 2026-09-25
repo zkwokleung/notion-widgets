@@ -1,7 +1,7 @@
 import { MenuItem, Select, useMediaQuery, useTheme } from "@mui/material";
 import {
-  langCodeToLanguageName,
-  langCodeToFlag,
+  languageName,
+  languageFlag,
   supportedLanguages,
 } from "../utils/lang";
 
@@ -30,8 +30,8 @@ function LanguageSelect(props: LanguageSelectProps) {
       {(props.availableLangs || supportedLanguages).map((language) => (
         <MenuItem key={language} value={language}>
           {(props.alwaysShowLabel || !isSmallScreen) &&
-            langCodeToLanguageName(language)}{" "}
-          {langCodeToFlag(language)}
+            languageName(language)}{" "}
+          {languageFlag(language)}
         </MenuItem>
       ))}
     </Select>

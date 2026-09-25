@@ -1,8 +1,10 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router";
+import { ThemeProvider, createTheme } from "@mui/material";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { createQueryClient } from "./api/queryClient";
 import router from "./Routes";
-import { ThemeProvider, createTheme } from "@mui/material";
 
 const darkTheme = createTheme({
   palette: {
@@ -16,7 +18,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={darkTheme}>
-        <RouterProvider router={router} />
+        <TooltipProvider delayDuration={400}>
+          <RouterProvider router={router} />
+          <Toaster position="bottom-center" />
+        </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

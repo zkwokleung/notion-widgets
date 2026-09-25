@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { langCodeToFlag, langCodeToLanguageName } from "./lang";
+import { languageFlag, languageName } from "./lang";
 
 describe("lang", () => {
-  it("maps language codes to country flags", () => {
-    expect(langCodeToFlag("en")).toBe("🇬🇧");
-    expect(langCodeToFlag("ja")).toBe("🇯🇵");
-    expect(langCodeToFlag("zh-TW")).toBe("🇹🇼");
+  it("maps language codes to the flag readers expect", () => {
+    expect(languageFlag("en")).toBe("🇬🇧");
+    expect(languageFlag("ja")).toBe("🇯🇵");
+    expect(languageFlag("fr")).toBe("🇫🇷");
+    expect(languageFlag("zh-TW")).toBe("🇹🇼");
   });
 
-  it("names languages by their base code", () => {
-    expect(langCodeToLanguageName("zh-TW")).toBe("Chinese");
-    expect(langCodeToLanguageName("fr")).toBe("French");
+  it("names any language code", () => {
+    expect(languageName("fr")).toBe("French");
+    expect(languageName("zh-TW")).toMatch(/Chinese/);
+    expect(languageName("not a code")).toBe("not a code");
   });
 });

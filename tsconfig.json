@@ -10,5 +10,12 @@
     {
       "path": "./tsconfig.worker.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  }
 }

@@ -1,65 +1,50 @@
-// Should be named as "languagesICareAbout"
 export const supportedLanguages = [
-  "zh-TW",
   "en",
+  "zh-TW",
+  "zh-CN",
   "ja",
   "ko",
-  "es",
   "fr",
   "de",
-  "id",
+  "es",
   "it",
+  "pt",
+  "ru",
+  "id",
+  "vi",
+  "th",
+  "ar",
+  "hi",
+  "nl",
+  "sv",
+  "pl",
+  "tr",
 ];
 
-export function langCodeToFlag(langCode: string) {
-  /* * Special cases */
-  // zh-CN -> CN, zh-TW -> TW
-  langCode = langCode.split("-")[1] || langCode;
+const displayNames = new Intl.DisplayNames(["en"], { type: "language" });
 
-  // en -> uk
-  if (langCode === "en") {
-    langCode = "gb";
+export function languageName(code: string): string {
+  try {
+    return displayNames.of(code) ?? code;
+  } catch {
+    return code;
   }
-
-  // ja -> jp
-  if (langCode === "ja") {
-    langCode = "jp";
-  }
-
-  // ko -> kr
-  if (langCode === "ko") {
-    langCode = "kr";
-  }
-
-  return langCode
-    .toUpperCase()
-    .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
 }
 
-export function langCodeToLanguageName(langCode: string) {
-  // zh-CN -> Chinese, zh-TW -> Chinese (Traditional)
-  langCode = langCode.split("-")[0] || langCode;
+// Languages aren't countries; these pick the flag most readers associate with each.
+const flagRegion: Record<string, string> = {
+  en: "GB",
+  ja: "JP",
+  ko: "KR",
+  ar: "SA",
+  hi: "IN",
+  vi: "VN",
+  sv: "SE",
+  zh: "CN",
+};
 
-  switch (langCode) {
-    case "zh":
-      return "Chinese";
-    case "en":
-      return "English";
-    case "ja":
-      return "Japanese";
-    case "ko":
-      return "Korean";
-    case "es":
-      return "Spanish";
-    case "fr":
-      return "French";
-    case "de":
-      return "German";
-    case "id":
-      return "Indonesian";
-    case "it":
-      return "Italian";
-    default:
-      return langCode;
-  }
+export function languageFlag(code: string): string {
+  const [language, region] = code.split("-");
+  const country = (region ?? flagRegion[language] ?? language).toUpperCase();
+  return country.replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
 }
