@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import LanguageSelect from "../../components/LanguageSelect";
 import { StyledTextField } from "../../components/StyledComponents";
 import SpeechPlayer from "../text-to-speech/SpeechPlayer";
 import { useDebounce } from "../../hooks/useDebounce";
-import { translateTo } from "../translator/translatorUitls";
+import { useTranslation } from "../../hooks/useTranslation";
 import RemoveButton from "../../components/RemoveButton";
 
 export interface DictEntryProps {
@@ -31,13 +31,18 @@ function DictEntry(props: DictEntryProps) {
   // Data
   const [text, setText] = useState(props.text);
   const textToTranslate = useDebounce(text, 1000);
-  const [translatedText, setTranslatedText] = useState("");
+  const translatedText = useTranslation(textToTranslate, props.from, props.to);
 
   // UI
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
-  const [originTextFieldSz, setOriginTextFieldSz] = useState(3.75);
-  const [translatedTextFieldSz, setTranslatedTextFieldSz] = useState(3.75);
+  const ttsButtonSz = isSmallScreen ? 1 : 0.5;
+  const baseTextFieldSz =
+    (isSmallScreen ? 3.25 : 3.75) + (props.fixedLang ? 1.5 : 0);
+  const originTextFieldSz =
+    baseTextFieldSz + (props.hideOriginTTSButton ? ttsButtonSz : 0);
+  const translatedTextFieldSz =
+    baseTextFieldSz + (props.hideTranslatedTTSButton ? ttsButtonSz : 0);
 
   // * Handlers
   const handleFromChange = (value: string) => {
@@ -56,40 +61,6 @@ function DictEntry(props: DictEntryProps) {
   function handleRemoveButtonClick(): void {
     props.onRemove?.(props.index);
   }
-
-  // * UseEffects
-  // Translation
-  useEffect(() => {
-    if (!textToTranslate || !props.from || !props.to) {
-      setTranslatedText("");
-      return;
-    }
-
-    const controller = new AbortController();
-    translateTo(textToTranslate, props.from, props.to, controller.signal)
-      .then(setTranslatedText)
-      .catch((error) => {
-        if (error.name !== "AbortError") throw error;
-      });
-    return () => controller.abort();
-  }, [textToTranslate, props.from, props.to]);
-
-  // TextField Size
-  useEffect(() => {
-    setOriginTextFieldSz(
-      (isSmallScreen ? 3.25 : 3.75) +
-        (props.fixedLang ? 1.5 : 0) +
-        (props.hideOriginTTSButton ? (isSmallScreen ? 1 : 0.5) : 0)
-    );
-  }, [isSmallScreen, props.fixedLang, props.hideOriginTTSButton]);
-
-  useEffect(() => {
-    setTranslatedTextFieldSz(
-      (isSmallScreen ? 3.25 : 3.75) +
-        (props.fixedLang ? 1.5 : 0) +
-        (props.hideTranslatedTTSButton ? (isSmallScreen ? 1 : 0.5) : 0)
-    );
-  }, [isSmallScreen, props.fixedLang, props.hideTranslatedTTSButton]);
 
   return (
     <Grid container spacing={1}>
@@ -120,7 +91,7 @@ function DictEntry(props: DictEntryProps) {
         />
       </Grid>
       {!props.hideOriginTTSButton && (
-        <Grid item xs={isSmallScreen ? 1 : 0.5}>
+        <Grid item xs={ttsButtonSz}>
           <SpeechPlayer lang={props.from} text={props.text} />
         </Grid>
       )}
@@ -129,7 +100,7 @@ function DictEntry(props: DictEntryProps) {
         <StyledTextField disabled fullWidth value={translatedText} />
       </Grid>
       {!props.hideTranslatedTTSButton && (
-        <Grid item xs={isSmallScreen ? 1 : 0.5}>
+        <Grid item xs={ttsButtonSz}>
           <SpeechPlayer lang={props.to} text={translatedText} />
         </Grid>
       )}

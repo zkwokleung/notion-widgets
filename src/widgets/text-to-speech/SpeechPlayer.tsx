@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Box, IconButton, Stack } from "@mui/material";
 import { getTextToSpeechURL } from "./textToSpeechUtils";
-import PlayCircleIcon from "@mui/icons-material/PlayCircle";
-import StopCircleIcon from "@mui/icons-material/StopCircle";
-import PendingIcon from "@mui/icons-material/Pending";
+import {
+  PlayCircle as PlayCircleIcon,
+  StopCircle as StopCircleIcon,
+  Pending as PendingIcon,
+} from "@mui/icons-material";
 import styled from "styled-components";
 
 const StyledIconButton = styled(IconButton)`

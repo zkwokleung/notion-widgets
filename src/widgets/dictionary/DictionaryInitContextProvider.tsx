@@ -20,6 +20,7 @@ const DictionaryInitContext = createContext<DictionaryInitContextReturn>({
   words: [{ id: crypto.randomUUID(), from: "fr", to: "en", text: "eau" }],
 });
 
+// eslint-disable-next-line react-refresh/only-export-components -- hook is colocated with its provider
 export function useDictionaryInitContext() {
   return useContext(DictionaryInitContext);
 }

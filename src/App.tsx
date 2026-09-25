@@ -1,4 +1,4 @@
-import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router-dom";
 import router from "./Routes";
 import { ThemeProvider, createTheme } from "@mui/material";
@@ -9,11 +9,15 @@ const darkTheme = createTheme({
   },
 });
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={darkTheme}>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

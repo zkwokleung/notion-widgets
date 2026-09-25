@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyledActionButton,
   StyledActionLayout,
   StyledCard,
 } from "../../components/StyledComponents";
 import {
-  DictWord,
+  type DictWord,
   useDictionaryInitContext,
 } from "./DictionaryInitContextProvider";
 import { useSearchParams } from "react-router-dom";
 import CopyParamalinkButton from "../../components/CopyParamalinkButton";
 import DictEntry from "./DictEntry";
-import AddIcon from "@mui/icons-material/Add";
+import { Add as AddIcon } from "@mui/icons-material";
 import OptionsButton from "../../components/OptionsButton";
 import { Box, Stack } from "@mui/material";
 import AutoLayout from "../../components/AutoLayout";

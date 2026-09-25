@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Grid, type SxProps, type Theme } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
 
@@ -12,7 +12,7 @@ const StyledGrid = styled(Grid)`
 export interface AutoLayoutProps {
   direction?: "row" | "column";
   children?: React.ReactNode;
-  sx?: any;
+  sx?: SxProps<Theme>;
 }
 
 function AutoLayout(props: AutoLayoutProps) {

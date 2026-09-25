@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { StyledActionButton } from "./StyledComponents";
-import DoneIcon from "@mui/icons-material/Done";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import {
+  Done as DoneIcon,
+  ContentCopy as ContentCopyIcon,
+} from "@mui/icons-material";
 import { Typography } from "@mui/material";
 
 function CopyParamalinkButton() {

@@ -1,5 +1,4 @@
 import { Grid, useMediaQuery, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
 import { supportedLanguages } from "../utils/lang";
 import LanguageSelect from "./LanguageSelect";
 import { StyledTextField } from "./StyledComponents";
@@ -20,13 +19,6 @@ function LanguageTextField(props: LanguageTextFieldProps) {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
 
-  // Local state
-  const [text, setText] = useState(props.text ?? "");
-
-  useEffect(() => {
-    setText(props.text ?? "");
-  }, [props.text]);
-
   return (
     <Grid container columnSpacing={1}>
       <Grid item xs={isSmallScreen ? 2 : 1.5}>
@@ -46,9 +38,8 @@ function LanguageTextField(props: LanguageTextFieldProps) {
           placeholder={props.placeholder ?? "..."}
           aria-readonly={true}
           inputProps={{ readOnly: props.readonlyTextField }}
-          value={text}
+          value={props.text ?? ""}
           onChange={(event) => {
-            setText(event.target.value);
             props.onTextChange?.(event.target.value);
           }}
         />

@@ -1,6 +1,5 @@
-import React from "react";
 import { StyledActionButton } from "./StyledComponents";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { Settings as SettingsIcon } from "@mui/icons-material";
 
 export interface OptionsButtonProps {
   onClick?: () => void;

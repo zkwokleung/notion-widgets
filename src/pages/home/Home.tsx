@@ -1,12 +1,13 @@
-import React from "react";
 import WidgetCard from "./WidgetCard";
 import AutoLayout from "../../components/AutoLayout";
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import styled from "styled-components";
 
-import TranslateIcon from "@mui/icons-material/Translate";
-import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import BookIcon from "@mui/icons-material/Book";
+import {
+  Translate as TranslateIcon,
+  VolumeUp as VolumeUpIcon,
+  Book as BookIcon,
+} from "@mui/icons-material";
 
 const StyledBody = styled(Box)`
   display: flex;
@@ -18,7 +19,7 @@ const StyledBody = styled(Box)`
   width: 100vw;
 `;
 
-export const widgetsData = [
+const widgetsData = [
   {
     title: "Translator",
     link: "/translator",

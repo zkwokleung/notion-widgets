@@ -1,6 +1,5 @@
-import React from "react";
 import styled from "styled-components";
-import CloseIcon from "@mui/icons-material/Close";
+import { Close as CloseIcon } from "@mui/icons-material";
 
 const StyledRemoveButton = styled.div`
   color: rgba(255, 255, 255, 0.23);

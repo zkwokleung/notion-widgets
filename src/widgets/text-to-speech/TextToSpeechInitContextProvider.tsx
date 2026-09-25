@@ -15,6 +15,7 @@ const TextToSpeechInitContext = createContext<TextToSpeechInitContextReturn>({
   speechTexts: [{ id: crypto.randomUUID(), lang: "fr", text: "eau" }],
 });
 
+// eslint-disable-next-line react-refresh/only-export-components -- hook is colocated with its provider
 export function useTextToSpeechInitContext() {
   return useContext(TextToSpeechInitContext);
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import {
-  SpeechText,
+  type SpeechText,
   useTextToSpeechInitContext,
 } from "./TextToSpeechInitContextProvider";
 import { Grid } from "@mui/material";

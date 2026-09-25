@@ -12,6 +12,7 @@ const TranslatorInitContext = createContext<TranslatorInitContextReturn>({
   to: [],
 });
 
+// eslint-disable-next-line react-refresh/only-export-components -- hook is colocated with its provider
 export function useTranslatorInitContext() {
   return useContext(TranslatorInitContext);
 }

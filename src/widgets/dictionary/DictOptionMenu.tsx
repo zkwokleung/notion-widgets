@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import LanguageSelect from "../../components/LanguageSelect";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { Settings as SettingsIcon } from "@mui/icons-material";
 import styled from "styled-components";
 
 const StyledBox = styled(Box)`

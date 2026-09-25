@@ -1,4 +1,3 @@
-import React from "react";
 import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import LanguageTextField from "../../components/LanguageTextField";
 import SpeechPlayer from "./SpeechPlayer";

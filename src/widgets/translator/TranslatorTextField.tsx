@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
-import { useEffect, useState } from "react";
-import { translateTo } from "./translatorUitls";
+import { useState } from "react";
+import { useTranslation } from "../../hooks/useTranslation";
 import { supportedLanguages } from "../../utils/lang";
 import LanguageTextField from "../../components/LanguageTextField";
 import RemoveButton from "../../components/RemoveButton";
@@ -19,31 +19,18 @@ export interface TranslatorTextFieldProps {
 }
 
 function TranslatorTextField(props: TranslatorTextFieldProps) {
-  // Local state
-  const [text, setText] = useState("");
-
-  useEffect(() => {
-    if (props.input) return;
-
-    if (!props.text || !props.fromLang) {
-      setText("");
-      return;
-    }
-
-    const controller = new AbortController();
-    translateTo(props.text, props.fromLang, props.lang, controller.signal)
-      .then(setText)
-      .catch((error) => {
-        if (error.name !== "AbortError") throw error;
-      });
-    return () => controller.abort();
-  }, [props.text, props.fromLang, props.lang, props.input]);
+  const [inputText, setInputText] = useState("");
+  const translatedText = useTranslation(
+    props.input ? "" : (props.text ?? ""),
+    props.fromLang ?? "",
+    props.lang
+  );
 
   return (
     <Grid container columnSpacing={1}>
       <Grid item xs={11.5}>
         <LanguageTextField
-          text={text}
+          text={props.input ? inputText : translatedText}
           availableLangs={
             props.input ? supportedLanguages : props.availableLangs ?? []
           }
@@ -54,7 +41,7 @@ function TranslatorTextField(props: TranslatorTextFieldProps) {
             props.onLangChange?.(event);
           }}
           onTextChange={(value) => {
-            setText(value);
+            setInputText(value);
             props.onTextChange?.(value);
           }}
         />
