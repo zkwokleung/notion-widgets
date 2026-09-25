@@ -1,8 +1,4 @@
-import {
-  Book as BookIcon,
-  Translate as TranslateIcon,
-  VolumeUp as VolumeUpIcon,
-} from "@mui/icons-material";
+import { BookOpen, Languages, Timer as TimerIcon, Volume2 } from "lucide-react";
 import { lazy, type ComponentType } from "react";
 import type { z } from "zod";
 import type { WidgetType } from "../../shared/api";
@@ -22,7 +18,7 @@ interface WidgetDefinition<T extends WidgetType> {
   type: T;
   title: string;
   description: string;
-  Icon: ComponentType;
+  Icon: ComponentType<{ className?: string }>;
   schema: z.ZodType<WidgetConfigMap[T], unknown>;
   Component: ComponentType<WidgetProps<WidgetConfigMap[T]>>;
 }
@@ -31,7 +27,7 @@ export interface RegisteredWidget {
   type: WidgetType;
   title: string;
   description: string;
-  Icon: ComponentType;
+  Icon: ComponentType<{ className?: string }>;
   schema: z.ZodType<unknown, unknown>;
   Component: ComponentType<WidgetProps<unknown>>;
 }
@@ -47,7 +43,7 @@ export const widgetDefinitions: RegisteredWidget[] = [
     type: "translator",
     title: "Translator",
     description: "Translate text into several languages at once.",
-    Icon: TranslateIcon,
+    Icon: Languages,
     schema: widgetConfigSchemas.translator,
     Component: lazy(() => import("./translator/Translator")),
   }),
@@ -55,7 +51,7 @@ export const widgetDefinitions: RegisteredWidget[] = [
     type: "text-to-speech",
     title: "Text-to-Speech",
     description: "A list of words or phrases you can listen to.",
-    Icon: VolumeUpIcon,
+    Icon: Volume2,
     schema: widgetConfigSchemas["text-to-speech"],
     Component: lazy(() => import("./text-to-speech/TextToSpeech")),
   }),
@@ -63,9 +59,17 @@ export const widgetDefinitions: RegisteredWidget[] = [
     type: "dictionary",
     title: "Dictionary",
     description: "A vocabulary list with translations and pronunciation.",
-    Icon: BookIcon,
+    Icon: BookOpen,
     schema: widgetConfigSchemas.dictionary,
     Component: lazy(() => import("./dictionary/Dictionary")),
+  }),
+  defineWidget({
+    type: "timer",
+    title: "Focus Timer",
+    description: "A Pomodoro timer with focus sessions and breaks.",
+    Icon: TimerIcon,
+    schema: widgetConfigSchemas.timer,
+    Component: lazy(() => import("./timer/Timer")),
   }),
 ];
 
