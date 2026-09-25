@@ -16,6 +16,7 @@ const StyledIconButton = styled(IconButton)`
 export interface SpeechPlayerProps {
   lang: string;
   text: string;
+  rate?: number;
 }
 
 function SpeechPlayer(props: SpeechPlayerProps) {
@@ -35,7 +36,7 @@ function SpeechPlayer(props: SpeechPlayerProps) {
             <StyledIconButton
               aria-label="Play"
               disabled={!props.text}
-              onClick={() => void speak(props.text, props.lang)}
+              onClick={() => void speak(props.text, props.lang, props.rate)}
             >
               <PlayCircleIcon style={iconStyle} />
             </StyledIconButton>

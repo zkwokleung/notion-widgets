@@ -16,25 +16,14 @@ export const MAX_CONFIG_BYTES = 64 * 1024;
 
 export const langCodeSchema = z.string().regex(/^[a-zA-Z]{2,3}(-[a-zA-Z]{2,4})?$/);
 
-export const widgetConfigSchema = z.record(z.string(), z.unknown());
-
-export const createWidgetBodySchema = z.object({
-  type: z.enum(WIDGET_TYPES),
-  config: widgetConfigSchema,
-});
-
-export const updateWidgetBodySchema = z.object({
-  config: widgetConfigSchema,
-});
-
 export interface TranslateResponse {
   text: string;
 }
 
-export interface WidgetDocument {
+export interface WidgetDocument<C = unknown> {
   id: string;
   type: WidgetType;
-  config: Record<string, unknown>;
+  config: C;
   updatedAt: string;
 }
 

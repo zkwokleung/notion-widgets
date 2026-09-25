@@ -3,11 +3,7 @@ import AutoLayout from "../../components/AutoLayout";
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import styled from "styled-components";
 
-import {
-  Translate as TranslateIcon,
-  VolumeUp as VolumeUpIcon,
-  Book as BookIcon,
-} from "@mui/icons-material";
+import { widgetDefinitions } from "../../widgets/registry";
 
 const StyledBody = styled(Box)`
   display: flex;
@@ -18,24 +14,6 @@ const StyledBody = styled(Box)`
   height: 100vh;
   width: 100vw;
 `;
-
-const widgetsData = [
-  {
-    title: "Translator",
-    link: "/translator",
-    avatar: <TranslateIcon />,
-  },
-  {
-    title: "Text-to-Speech",
-    link: "/text-to-speech",
-    avatar: <VolumeUpIcon />,
-  },
-  {
-    title: "Dictionary",
-    link: "/dictionary",
-    avatar: <BookIcon />,
-  },
-];
 
 function Home() {
   return (
@@ -52,16 +30,9 @@ function Home() {
           }}
         >
           <AutoLayout>
-            {widgetsData.map((widget) => {
-              return (
-                <WidgetCard
-                  key={widget.link}
-                  title={widget.title}
-                  link={widget.link}
-                  avatar={widget.avatar}
-                />
-              );
-            })}
+            {widgetDefinitions.map(({ type, title, Icon }) => (
+              <WidgetCard key={type} title={title} link={`/${type}`} avatar={<Icon />} />
+            ))}
           </AutoLayout>
         </Box>
       </StyledBody>

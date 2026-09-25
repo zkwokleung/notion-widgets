@@ -7,6 +7,7 @@ export interface TTSTextFieldProps {
   id: number;
   lang: string;
   text: string;
+  rate?: number;
   fixedLang?: boolean;
   placeholder?: string;
   availableLangs?: string[];
@@ -52,7 +53,7 @@ function TTSTextField(props: TTSTextFieldProps) {
         )}
       </Grid>
       <Grid item xs={isSmallScreen ? 1 : 0.5}>
-        <SpeechPlayer lang={props.lang} text={props.text} />
+        <SpeechPlayer lang={props.lang} text={props.text} rate={props.rate} />
       </Grid>
     </Grid>
   );

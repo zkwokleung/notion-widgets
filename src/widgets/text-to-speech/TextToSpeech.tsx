@@ -1,86 +1,59 @@
-import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import {
-  type SpeechText,
-  useTextToSpeechInitContext,
-} from "./TextToSpeechInitContextProvider";
 import { Grid } from "@mui/material";
+import type {
+  SpeechEntry,
+  TextToSpeechConfig,
+} from "../../../shared/widgetConfigs";
 import TTSTextField from "./TTSTextField";
 import {
   StyledActionButton,
   StyledActionLayout,
   StyledCard,
 } from "../../components/StyledComponents";
-import CopyParamalinkButton from "../../components/CopyParamalinkButton";
+import type { WidgetProps } from "../registry";
 
-function TextToSpeech() {
-  const { lang: fixedLang } = useParams<{ lang: string }>();
-  const { speechTexts: initSpeechTexts } = useTextToSpeechInitContext();
-  const [speechTexts, setSpeechTexts] = useState(initSpeechTexts);
+function TextToSpeech({
+  config,
+  onChange,
+  readOnly,
+}: WidgetProps<TextToSpeechConfig>) {
+  const { fixedLang, entries, rate } = config;
 
-  const [, setSearchParams] = useSearchParams();
-
-  const updateSpeechText = (index: number, patch: Partial<SpeechText>) => {
-    setSpeechTexts((prev) =>
-      prev.map((speechText, i) =>
-        i === index ? { ...speechText, ...patch } : speechText
-      )
-    );
-  };
-
-  const handleLanguageSelected = (value: string, index: number) => {
-    updateSpeechText(index, { lang: value });
-  };
-
-  const handleTextChange = (value: string, index: number) => {
-    updateSpeechText(index, { text: value });
-  };
-
-  const handleAddSpeech = () => {
-    setSpeechTexts((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        lang: fixedLang ?? "en",
-        text: "",
-      },
-    ]);
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    speechTexts.forEach((speechText) => {
-      if (!speechText.text) return;
-
-      if (!fixedLang) {
-        params.append("lang", speechText.lang);
-      }
-      params.append("text", speechText.text);
+  const updateEntry = (index: number, patch: Partial<SpeechEntry>) => {
+    onChange({
+      ...config,
+      entries: entries.map((entry, i) => (i === index ? { ...entry, ...patch } : entry)),
     });
+  };
 
-    setSearchParams(params);
-  }, [speechTexts, fixedLang, setSearchParams]);
+  const handleAddEntry = () => {
+    onChange({
+      ...config,
+      entries: [...entries, { id: crypto.randomUUID(), lang: fixedLang ?? "en", text: "" }],
+    });
+  };
 
   return (
     <StyledCard variant="outlined">
       <Grid container rowSpacing={1}>
-        {speechTexts.map((speechText, idx) => (
-          <Grid item xs={12} key={speechText.id}>
+        {entries.map((entry, idx) => (
+          <Grid item xs={12} key={entry.id}>
             <TTSTextField
               id={idx}
-              lang={fixedLang ?? speechText.lang}
-              text={speechText.text}
+              lang={fixedLang ?? entry.lang}
+              text={entry.text}
+              rate={rate}
               fixedLang={!!fixedLang}
-              onLanguageSelected={handleLanguageSelected}
-              onTextChange={handleTextChange}
+              onLanguageSelected={(lang, index) => updateEntry(index, { lang })}
+              onTextChange={(text, index) => updateEntry(index, { text })}
             />
           </Grid>
         ))}
       </Grid>
-      <StyledActionLayout>
-        <StyledActionButton onClick={handleAddSpeech}>+</StyledActionButton>
-        <CopyParamalinkButton />
-      </StyledActionLayout>
+      {!readOnly && (
+        <StyledActionLayout>
+          <StyledActionButton onClick={handleAddEntry}>+</StyledActionButton>
+        </StyledActionLayout>
+      )}
     </StyledCard>
   );
 }

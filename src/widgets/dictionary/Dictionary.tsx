@@ -1,154 +1,48 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import type { DictWord, DictionaryConfig } from "../../../shared/widgetConfigs";
 import {
   StyledActionButton,
   StyledActionLayout,
   StyledCard,
 } from "../../components/StyledComponents";
-import {
-  type DictWord,
-  useDictionaryInitContext,
-} from "./DictionaryInitContextProvider";
-import { useSearchParams } from "react-router-dom";
-import CopyParamalinkButton from "../../components/CopyParamalinkButton";
 import DictEntry from "./DictEntry";
 import { Add as AddIcon } from "@mui/icons-material";
 import OptionsButton from "../../components/OptionsButton";
 import { Box, Stack } from "@mui/material";
-import AutoLayout from "../../components/AutoLayout";
 import DictOptionMenu from "./DictOptionMenu";
+import type { WidgetProps } from "../registry";
 
-function Dictionary() {
-  const {
-    hideOriginTTSBtn: initHideOriginTTSBtn,
-    hideTranslatedTTSBtn: initHideTranslatedBrn,
-    fixedFrom: initFixedFrom,
-    fixedTo: initFixedTo,
-    words: initWords,
-  } = useDictionaryInitContext();
+const DEFAULT_PAIR = { from: "fr", to: "en" };
 
-  const [fixedLang, setFixedLang] = useState(!!initFixedFrom && !!initFixedTo);
-  const [fixedFrom, setFixedFrom] = useState(initFixedFrom);
-  const [fixedTo, setFixedTo] = useState(initFixedTo);
-  const [words, setWords] = useState(initWords);
-
-  const [, setSearchParams] = useSearchParams();
-
-  // Menus
+function Dictionary({ config, onChange, readOnly }: WidgetProps<DictionaryConfig>) {
+  const { fixedLang, words } = config;
   const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
-  const [hideOriginTTSBtn, setHideOriginTTSBtn] =
-    useState(initHideOriginTTSBtn);
-  const [hideTranslatedTTSBtn, setHideTranslatedTTSbtn] = useState(
-    initHideTranslatedBrn
-  );
 
-  // Event Handlers
-  function updateWord(index: number, patch: Partial<DictWord>): void {
-    setWords((prev) =>
-      prev.map((word, i) => (i === index ? { ...word, ...patch } : word))
-    );
-  }
+  const update = (patch: Partial<DictionaryConfig>) => onChange({ ...config, ...patch });
 
-  function handleFromChange(value: string, index: number): void {
-    updateWord(index, { from: value });
-  }
+  const updateWord = (index: number, patch: Partial<DictWord>) => {
+    update({ words: words.map((word, i) => (i === index ? { ...word, ...patch } : word)) });
+  };
 
-  function handleToChange(value: string, index: number): void {
-    updateWord(index, { to: value });
-  }
-
-  function handleTextChange(value: string, index: number): void {
-    updateWord(index, { text: value });
-  }
-
-  function handleRemoveButtonClick(index: number): void {
-    setWords((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function handleAddButtonClick(): void {
-    setWords((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), from: "fr", to: "en", text: "" },
-    ]);
-  }
-
-  // * Options Menu
-  function handleOptionsButtonClick(): void {
-    setOptionsMenuOpen(true);
-  }
-
-  function handleOptionMenuClose(): void {
-    setOptionsMenuOpen(false);
-  }
-
-  function handleOptionMenuOriginTTSBtnDisplayChange(value: boolean): void {
-    setHideOriginTTSBtn(value);
-  }
-
-  function handleOptionMenuTranslatedTTSBtnDisplayChange(value: boolean): void {
-    setHideTranslatedTTSbtn(value);
-  }
-
-  function handleOptionMenuFixedLangChange(value: boolean): void {
-    setFixedLang(value);
-    if (value) {
-      if (!fixedFrom) {
-        setFixedFrom("fr");
-      }
-      if (!fixedTo) {
-        setFixedTo("en");
-      }
-    } else {
-      setWords(
-        words.map((word) => {
-          return { ...word, from: "fr", to: "en" };
-        })
-      );
-    }
-  }
-
-  function handleOptionMenuFromChange(value: string): void {
-    setFixedFrom(value);
-  }
-
-  function handleOptionMenuToChange(value: string): void {
-    setFixedTo(value);
-  }
-
-  // * UseEffects
-  // Search Params
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (fixedLang) {
-      params.append("fixedFrom", fixedFrom || "");
-      params.append("fixedTo", fixedTo || "");
-    }
-
-    if (hideOriginTTSBtn) {
-      params.append("hotb", "true");
-    }
-
-    if (hideTranslatedTTSBtn) {
-      params.append("httb", "true");
-    }
-
-    words.forEach((word) => {
-      if (!fixedLang) {
-        params.append("from", word.from);
-        params.append("to", word.to);
-      }
-      params.append("text", word.text);
+  const handleAddWord = () => {
+    const pair = fixedLang ?? words.at(-1) ?? DEFAULT_PAIR;
+    update({
+      words: [...words, { id: crypto.randomUUID(), from: pair.from, to: pair.to, text: "" }],
     });
-    setSearchParams(params);
-  }, [
-    words,
-    setSearchParams,
-    fixedLang,
-    fixedFrom,
-    fixedTo,
-    hideOriginTTSBtn,
-    hideTranslatedTTSBtn,
-  ]);
+  };
+
+  const handleFixedLangChange = (enabled: boolean) => {
+    if (enabled) {
+      update({ fixedLang: words[0] ? { from: words[0].from, to: words[0].to } : DEFAULT_PAIR });
+    } else {
+      // Keep the pair that was in effect instead of reverting to each word's old one.
+      const pair = fixedLang ?? DEFAULT_PAIR;
+      update({
+        fixedLang: null,
+        words: words.map((word) => ({ ...word, from: pair.from, to: pair.to })),
+      });
+    }
+  };
 
   return (
     <>
@@ -158,47 +52,46 @@ function Dictionary() {
             <DictEntry
               key={word.id}
               index={i}
-              hideOriginTTSButton={hideOriginTTSBtn}
-              hideTranslatedTTSButton={hideTranslatedTTSBtn}
-              from={fixedLang && fixedFrom ? fixedFrom : word.from}
-              to={fixedLang && fixedTo ? fixedTo : word.to}
+              hideOriginTTSButton={config.hideOriginTTS}
+              hideTranslatedTTSButton={config.hideTranslatedTTS}
+              from={fixedLang?.from ?? word.from}
+              to={fixedLang?.to ?? word.to}
               text={word.text}
-              fixedLang={fixedLang}
-              onFromChange={handleFromChange}
-              onToChange={handleToChange}
-              onTextChange={handleTextChange}
-              onRemove={handleRemoveButtonClick}
+              rate={config.rate}
+              fixedLang={!!fixedLang}
+              readOnly={readOnly}
+              onFromChange={(from, index) => updateWord(index, { from })}
+              onToChange={(to, index) => updateWord(index, { to })}
+              onTextChange={(text, index) => updateWord(index, { text })}
+              onRemove={(index) => update({ words: words.filter((_, j) => j !== index) })}
             />
           ))}
         </Stack>
-        <StyledActionLayout>
-          <StyledActionButton onClick={handleAddButtonClick}>
-            <AddIcon />
-          </StyledActionButton>
-          <Box sx={{ marginLeft: "auto" }}>
-            <AutoLayout>
-              <OptionsButton onClick={handleOptionsButtonClick} />
-              <CopyParamalinkButton />
-            </AutoLayout>
-          </Box>
-        </StyledActionLayout>
+        {!readOnly && (
+          <StyledActionLayout>
+            <StyledActionButton onClick={handleAddWord}>
+              <AddIcon />
+            </StyledActionButton>
+            <Box sx={{ marginLeft: "auto" }}>
+              <OptionsButton onClick={() => setOptionsMenuOpen(true)} />
+            </Box>
+          </StyledActionLayout>
+        )}
       </StyledCard>
 
       <DictOptionMenu
         open={optionsMenuOpen}
-        onClose={handleOptionMenuClose}
-        fixedLang={fixedLang}
-        hideOriginTTSBtn={hideOriginTTSBtn}
-        hideTranslatedTTSBtn={hideTranslatedTTSBtn}
-        from={fixedFrom}
-        to={fixedTo}
-        onHideOriginTTSBtnChange={handleOptionMenuOriginTTSBtnDisplayChange}
-        onHideTranslatedTTSBtnChange={
-          handleOptionMenuTranslatedTTSBtnDisplayChange
-        }
-        onFixedLangChange={handleOptionMenuFixedLangChange}
-        onFromChange={handleOptionMenuFromChange}
-        onToChange={handleOptionMenuToChange}
+        onClose={() => setOptionsMenuOpen(false)}
+        fixedLang={!!fixedLang}
+        hideOriginTTSBtn={config.hideOriginTTS}
+        hideTranslatedTTSBtn={config.hideTranslatedTTS}
+        from={fixedLang?.from}
+        to={fixedLang?.to}
+        onHideOriginTTSBtnChange={(hideOriginTTS) => update({ hideOriginTTS })}
+        onHideTranslatedTTSBtnChange={(hideTranslatedTTS) => update({ hideTranslatedTTS })}
+        onFixedLangChange={handleFixedLangChange}
+        onFromChange={(from) => fixedLang && update({ fixedLang: { ...fixedLang, from } })}
+        onToChange={(to) => fixedLang && update({ fixedLang: { ...fixedLang, to } })}
       />
     </>
   );

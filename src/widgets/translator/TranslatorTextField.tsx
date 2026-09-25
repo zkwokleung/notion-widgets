@@ -46,7 +46,7 @@ function TranslatorTextField(props: TranslatorTextFieldProps) {
           }}
         />
       </Grid>
-      {!props.input && (
+      {!props.input && props.onRemoveLang && (
         <Grid item xs={0.5}>
           <RemoveButton onClick={() => props.onRemoveLang?.(props.lang)} />
         </Grid>

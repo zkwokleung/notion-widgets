@@ -3,13 +3,16 @@ import type { z } from "zod";
 import {
   EDIT_KEY_HEADER,
   MAX_CONFIG_BYTES,
-  createWidgetBodySchema,
-  updateWidgetBodySchema,
   type ApiError,
   type CreateWidgetResponse,
   type WidgetDocument,
   type WidgetType,
 } from "../../shared/api";
+import {
+  createWidgetBodySchema,
+  updateWidgetBodySchema,
+  widgetConfigSchemas,
+} from "../../shared/widgetConfigs";
 import type { AppEnv } from "../cache";
 import {
   createEditKey,
@@ -20,7 +23,7 @@ import {
 
 interface StoredWidget {
   type: WidgetType;
-  config: Record<string, unknown>;
+  config: unknown;
   editKeyHash: string;
   createdAt: string;
   updatedAt: string;
@@ -113,9 +116,14 @@ export const widgets = new Hono<AppEnv>()
     const body = await readBody(c, updateWidgetBodySchema);
     if ("response" in body) return body.response;
 
+    const config = widgetConfigSchemas[auth.stored.type].safeParse(body.data.config);
+    if (!config.success) {
+      return c.json<ApiError>({ error: "Invalid widget config" }, 400);
+    }
+
     const updated: StoredWidget = {
       ...auth.stored,
-      config: body.data.config,
+      config: config.data,
       updatedAt: new Date().toISOString(),
     };
     await c.env.WIDGETS.put(kvKey(id), JSON.stringify(updated));

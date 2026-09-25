@@ -1,4 +1,11 @@
-import type { ApiError, TranslateResponse } from "../../shared/api";
+import {
+  EDIT_KEY_HEADER,
+  type ApiError,
+  type CreateWidgetResponse,
+  type TranslateResponse,
+  type WidgetDocument,
+  type WidgetType,
+} from "../../shared/api";
 
 export class ApiRequestError extends Error {
   readonly status: number;
@@ -7,6 +14,13 @@ export class ApiRequestError extends Error {
     super(message);
     this.status = status;
   }
+}
+
+/** Retry network and 5xx failures only; a 4xx will fail the same way again. */
+export function shouldRetry(failureCount: number, error: unknown): boolean {
+  const clientError =
+    error instanceof ApiRequestError && error.status >= 400 && error.status < 500;
+  return !clientError && failureCount < 2;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -34,4 +48,32 @@ export async function translate(
 
 export function ttsUrl(text: string, lang: string): string {
   return `/api/tts?${new URLSearchParams({ q: text, tl: lang })}`;
+}
+
+export function getWidget<C>(id: string, signal?: AbortSignal) {
+  return request<WidgetDocument<C>>(`/api/widgets/${encodeURIComponent(id)}`, {
+    signal,
+  });
+}
+
+export function createWidget(type: WidgetType, config: unknown) {
+  return request<CreateWidgetResponse>("/api/widgets", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, config }),
+  });
+}
+
+export function updateWidget<C>(
+  id: string,
+  editKey: string,
+  config: C,
+  options: { keepalive?: boolean } = {}
+) {
+  return request<WidgetDocument<C>>(`/api/widgets/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    keepalive: options.keepalive,
+    headers: { "Content-Type": "application/json", [EDIT_KEY_HEADER]: editKey },
+    body: JSON.stringify({ config }),
+  });
 }

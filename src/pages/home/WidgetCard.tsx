@@ -1,12 +1,12 @@
 import { Card, CardActionArea, CardHeader } from "@mui/material";
-import React from "react";
-import { Link } from "react-router-dom";
+import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 export interface WidgetCardProps {
   title: string;
   link: string;
   image?: string;
-  avatar?: React.ReactNode;
+  avatar?: ReactNode;
 }
 
 function WidgetCard(props: WidgetCardProps) {

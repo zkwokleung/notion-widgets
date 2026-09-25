@@ -1,66 +1,24 @@
-import { createHashRouter } from "react-router-dom";
-import Home from "./pages/home/Home";
+import { createBrowserRouter, type RouteObject } from "react-router";
 import ErrorPage from "./pages/error/ErrorPage";
-import Translator from "./widgets/translator/Translator";
-import TranslatorInitContextProvider from "./widgets/translator/TranslatorInitContextProvider";
-import TextToSpeech from "./widgets/text-to-speech/TextToSpeech";
-import TextToSpeechInitContextProvider from "./widgets/text-to-speech/TextToSpeechInitContextProvider";
-import Dictionary from "./widgets/dictionary/Dictionary";
-import DictionaryInitContextProvider from "./widgets/dictionary/DictionaryInitContextProvider";
+import NotFound from "./pages/error/NotFound";
+import Home from "./pages/home/Home";
+import { Root, WidgetTypeRoute } from "./pages/RouteElements";
+import SavedWidgetPage from "./pages/widget/SavedWidgetPage";
 
-const router = createHashRouter([
+export const routes: RouteObject[] = [
   {
     path: "/",
-    element: <Home />,
+    element: <Root />,
     errorElement: <ErrorPage />,
+    children: [
+      { index: true, element: <Home /> },
+      // Old GitHub Pages path; its hash links are handled by Root.
+      { path: "notion-widgets", element: <Home /> },
+      { path: "w/:id", element: <SavedWidgetPage /> },
+      { path: ":type", element: <WidgetTypeRoute /> },
+      { path: "*", element: <NotFound /> },
+    ],
   },
+];
 
-  // Alias for the home page
-  {
-    path: "/notion-widgets",
-    element: <Home />,
-    errorElement: <ErrorPage />,
-  },
-
-  {
-    path: "/translator",
-    element: (
-      <TranslatorInitContextProvider>
-        <Translator />
-      </TranslatorInitContextProvider>
-    ),
-    errorElement: <ErrorPage />,
-  },
-
-  {
-    path: "/text-to-speech/:lang",
-    element: (
-      <TextToSpeechInitContextProvider>
-        <TextToSpeech />
-      </TextToSpeechInitContextProvider>
-    ),
-    errorElement: <ErrorPage />,
-  },
-
-  {
-    path: "/text-to-speech",
-    element: (
-      <TextToSpeechInitContextProvider>
-        <TextToSpeech />
-      </TextToSpeechInitContextProvider>
-    ),
-    errorElement: <ErrorPage />,
-  },
-
-  {
-    path: "/dictionary",
-    element: (
-      <DictionaryInitContextProvider>
-        <Dictionary />
-      </DictionaryInitContextProvider>
-    ),
-    errorElement: <ErrorPage />,
-  },
-]);
-
-export default router;
+export default createBrowserRouter(routes);

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ApiRequestError, translate, ttsUrl } from "./client";
+import { ApiRequestError, shouldRetry, translate, ttsUrl } from "./client";
 
 describe("api client", () => {
   afterEach(() => {
@@ -32,5 +32,12 @@ describe("api client", () => {
 
   it("builds same-origin TTS URLs", () => {
     expect(ttsUrl("a & b", "fr")).toBe("/api/tts?q=a+%26+b&tl=fr");
+  });
+
+  it("retries network and server errors but not client errors", () => {
+    expect(shouldRetry(0, new TypeError("Failed to fetch"))).toBe(true);
+    expect(shouldRetry(0, new ApiRequestError(502, "bad gateway"))).toBe(true);
+    expect(shouldRetry(2, new ApiRequestError(502, "bad gateway"))).toBe(false);
+    expect(shouldRetry(0, new ApiRequestError(404, "not found"))).toBe(false);
   });
 });

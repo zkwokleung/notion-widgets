@@ -13,6 +13,8 @@ export interface DictEntryProps {
   from: string;
   to: string;
   text: string;
+  rate?: number;
+  readOnly?: boolean;
 
   hideOriginTTSButton?: boolean;
   hideTranslatedTTSButton?: boolean;
@@ -92,7 +94,7 @@ function DictEntry(props: DictEntryProps) {
       </Grid>
       {!props.hideOriginTTSButton && (
         <Grid item xs={ttsButtonSz}>
-          <SpeechPlayer lang={props.from} text={props.text} />
+          <SpeechPlayer lang={props.from} text={props.text} rate={props.rate} />
         </Grid>
       )}
 
@@ -101,13 +103,15 @@ function DictEntry(props: DictEntryProps) {
       </Grid>
       {!props.hideTranslatedTTSButton && (
         <Grid item xs={ttsButtonSz}>
-          <SpeechPlayer lang={props.to} text={translatedText} />
+          <SpeechPlayer lang={props.to} text={translatedText} rate={props.rate} />
         </Grid>
       )}
 
-      <Grid item xs={0.5}>
-        <RemoveButton onClick={handleRemoveButtonClick} />
-      </Grid>
+      {!props.readOnly && (
+        <Grid item xs={0.5}>
+          <RemoveButton onClick={handleRemoveButtonClick} />
+        </Grid>
+      )}
     </Grid>
   );
 }

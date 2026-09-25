@@ -1,9 +1,7 @@
 import { Divider, Grid } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import type { TranslatorConfig } from "../../../shared/widgetConfigs";
 import TranslatorTextField from "./TranslatorTextField";
-import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
-
 import { supportedLanguages } from "../../utils/lang";
 import { useDebounce } from "../../hooks/useDebounce";
 import {
@@ -12,79 +10,36 @@ import {
   StyledCard,
   StyledGrid,
 } from "../../components/StyledComponents";
-import CopyParamalinkButton from "../../components/CopyParamalinkButton";
+import type { WidgetProps } from "../registry";
 
-export default function Translator() {
-  // Translator
+export default function Translator({
+  config,
+  onChange,
+  readOnly,
+}: WidgetProps<TranslatorConfig>) {
   const [text, setText] = useState("");
   const textToTranslate = useDebounce(text, 500);
+  const { from, to } = config;
 
-  // Load the initial languages from the URL search params
-  const { from, to } = useTranslatorInitContext();
+  const unusedLanguages = supportedLanguages.filter(
+    (lang) => lang !== from && !to.includes(lang)
+  );
 
-  const [fromLanguage, setFromLanguage] = useState(from);
-  const [toLanguages, setToLanguages] = useState(to);
-
-  const [, setSearchParams] = useSearchParams();
-
-  const availableToLanguages = useMemo(() => {
-    return supportedLanguages.filter(
-      (lang) => lang !== fromLanguage && !toLanguages.includes(lang)
-    );
-  }, [fromLanguage, toLanguages]);
-
-  const handleTextChange = (value: string) => {
-    setText(value);
-  };
-
-  const handleLanguageSelected = (value: string) => {
-    setFromLanguage(value);
+  const handleFromChange = (value: string) => {
+    onChange({ from: value, to: to.filter((lang) => lang !== value) });
   };
 
   const handleToLangChange = (lang: string, newLang: string) => {
-    const newToLanguages = [...toLanguages];
-    const index = newToLanguages.indexOf(lang);
-    if (index > -1) {
-      newToLanguages.splice(index, 1, newLang);
-    }
-
-    setToLanguages(newToLanguages);
+    onChange({ from, to: to.map((current) => (current === lang ? newLang : current)) });
   };
 
   const handleAddToLang = () => {
-    const newToLanguages = [...toLanguages];
-
-    // Find the unselected to language
-    const unselectedLang = supportedLanguages.find(
-      (lang) => !toLanguages.includes(lang) && lang !== fromLanguage
-    );
-
-    if (!unselectedLang) {
-      alert("No more supported languages to add!");
-      return;
-    }
-
-    newToLanguages.push(unselectedLang);
-    setToLanguages(newToLanguages);
+    if (unusedLanguages[0]) onChange({ from, to: [...to, unusedLanguages[0]] });
   };
 
   const handleRemoveToLang = (lang: string) => {
-    const newToLanguages = [...toLanguages];
-    const index = newToLanguages.indexOf(lang);
-    if (index > -1) {
-      newToLanguages.splice(index, 1);
-    }
-
-    setToLanguages(newToLanguages);
+    onChange({ from, to: to.filter((current) => current !== lang) });
   };
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    params.set("from", fromLanguage);
-    toLanguages.forEach((lang) => params.append("to", lang));
-
-    setSearchParams(params);
-  }, [fromLanguage, toLanguages, setSearchParams]);
 
   return (
     <StyledCard variant="outlined">
@@ -92,9 +47,9 @@ export default function Translator() {
         <StyledGrid item xs={12}>
           <TranslatorTextField
             input
-            lang={fromLanguage}
-            onLangChange={handleLanguageSelected}
-            onTextChange={handleTextChange}
+            lang={from}
+            onLangChange={handleFromChange}
+            onTextChange={setText}
             placeholder="Type something to translate..."
           />
         </StyledGrid>
@@ -105,23 +60,29 @@ export default function Translator() {
           </Divider>
         </StyledGrid>
 
-        {toLanguages.map((lang) => (
+        {to.map((lang) => (
           <StyledGrid item xs={12} key={lang}>
             <TranslatorTextField
-              fromLang={fromLanguage}
+              fromLang={from}
               text={textToTranslate}
               lang={lang}
               onLangChange={(newLang) => handleToLangChange(lang, newLang)}
-              onRemoveLang={handleRemoveToLang}
-              availableLangs={[...availableToLanguages, lang]}
+              onRemoveLang={readOnly ? undefined : handleRemoveToLang}
+              availableLangs={[...unusedLanguages, lang]}
             />
           </StyledGrid>
         ))}
       </Grid>
-      <StyledActionLayout>
-        <StyledActionButton onClick={handleAddToLang}>+</StyledActionButton>
-        <CopyParamalinkButton />
-      </StyledActionLayout>
+      {!readOnly && (
+        <StyledActionLayout>
+          <StyledActionButton
+            onClick={handleAddToLang}
+            aria-disabled={unusedLanguages.length === 0}
+          >
+            +
+          </StyledActionButton>
+        </StyledActionLayout>
+      )}
     </StyledCard>
   );
 }

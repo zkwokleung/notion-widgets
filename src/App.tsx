@@ -1,5 +1,6 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider } from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "react-router";
+import { createQueryClient } from "./api/queryClient";
 import router from "./Routes";
 import { ThemeProvider, createTheme } from "@mui/material";
 
@@ -9,7 +10,7 @@ const darkTheme = createTheme({
   },
 });
 
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
 
 function App() {
   return (

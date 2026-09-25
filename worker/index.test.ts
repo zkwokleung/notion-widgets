@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CreateWidgetResponse, WidgetDocument } from "../shared/api";
+import type { DictionaryConfig } from "../shared/widgetConfigs";
 import { app } from "./index";
 import { createTestEnv } from "./test/fakes";
+
+const word = (text: string) => ({ id: text, from: "fr", to: "en", text });
 
 function mockUpstream(response: Response) {
   const fetchMock = vi.fn().mockResolvedValue(response);
@@ -72,7 +75,7 @@ describe("/api/widgets", () => {
   async function createWidget(env: Env, ctx: ExecutionContext) {
     const res = await app.request(
       "/api/widgets",
-      { method: "POST", ...json({ type: "dictionary", config: { words: ["eau"] } }) },
+      { method: "POST", ...json({ type: "dictionary", config: { words: [word("eau")] } }) },
       env,
       ctx
     );
@@ -86,17 +89,19 @@ describe("/api/widgets", () => {
 
     const read = await app.request(`/api/widgets/${id}`, {}, env, ctx);
     const doc = (await read.json()) as WidgetDocument;
-    expect(doc).toMatchObject({ id, type: "dictionary", config: { words: ["eau"] } });
+    expect(doc).toMatchObject({ id, type: "dictionary", config: { words: [word("eau")] } });
     expect(JSON.stringify(doc)).not.toContain(editKey);
     expect(kv.store.get(`widget:${id}`)).not.toContain(editKey);
 
     const updated = await app.request(
       `/api/widgets/${id}`,
-      { method: "PUT", ...json({ config: { words: ["vin"] } }, { "X-Edit-Key": editKey }) },
+      { method: "PUT", ...json({ config: { words: [word("vin")] } }, { "X-Edit-Key": editKey }) },
       env,
       ctx
     );
-    expect(((await updated.json()) as WidgetDocument).config).toEqual({ words: ["vin"] });
+    expect(((await updated.json()) as WidgetDocument<DictionaryConfig>).config.words).toEqual([
+      word("vin"),
+    ]);
 
     const deleted = await app.request(
       `/api/widgets/${id}`,
@@ -132,6 +137,12 @@ describe("/api/widgets", () => {
       env,
       ctx
     );
+    const badConfig = await app.request(
+      "/api/widgets",
+      { method: "POST", ...json({ type: "timer", config: { focusMinutes: -1 } }) },
+      env,
+      ctx
+    );
     const tooLarge = await app.request(
       "/api/widgets",
       { method: "POST", ...json({ type: "timer", config: { x: "a".repeat(70_000) } }) },
@@ -139,6 +150,7 @@ describe("/api/widgets", () => {
       ctx
     );
     expect(badType.status).toBe(400);
+    expect(badConfig.status).toBe(400);
     expect(tooLarge.status).toBe(413);
   });
 
