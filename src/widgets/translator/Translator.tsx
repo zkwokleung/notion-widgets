@@ -1,7 +1,6 @@
-import { Card, Divider, Grid } from "@mui/material";
+import { Divider, Grid } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import styled from "styled-components";
 import TranslatorTextField from "./TranslatorTextField";
 import { useTranslatorInitContext } from "./TranslatorInitContextProvider";
 
@@ -10,18 +9,10 @@ import { useDebounce } from "../../hooks/useDebounce";
 import {
   StyledActionLayout,
   StyledActionButton,
+  StyledCard,
+  StyledGrid,
 } from "../../components/StyledComponents";
 import CopyParamalinkButton from "../../components/CopyParamalinkButton";
-
-const StyledCard = styled(Card)`
-  color: white;
-  padding: 1rem;
-  margin: 0rem;
-`;
-
-const StyledGrid = styled(Grid)`
-  margin: 1rem;
-`;
 
 export default function Translator() {
   // Translator
@@ -35,8 +26,6 @@ export default function Translator() {
   const [toLanguages, setToLanguages] = useState(to);
 
   const [, setSearchParams] = useSearchParams();
-
-  const [copied, setCopied] = useState(false);
 
   const availableToLanguages = useMemo(() => {
     return supportedLanguages.filter(
@@ -96,15 +85,6 @@ export default function Translator() {
 
     setSearchParams(params);
   }, [fromLanguage, toLanguages, setSearchParams]);
-
-  useEffect(() => {
-    if (copied) {
-      const timeout = setTimeout(() => {
-        setCopied(false);
-      }, 3000);
-      return () => clearTimeout(timeout);
-    }
-  }, [copied]);
 
   return (
     <StyledCard variant="outlined">

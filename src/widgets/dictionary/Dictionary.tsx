@@ -86,7 +86,6 @@ function Dictionary() {
 
   function handleOptionMenuFixedLangChange(value: boolean): void {
     setFixedLang(value);
-    console.log(value);
     if (value) {
       if (!fixedFrom) {
         setFixedFrom("fr");

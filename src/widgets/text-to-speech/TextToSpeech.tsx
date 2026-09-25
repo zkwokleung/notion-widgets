@@ -27,7 +27,6 @@ function TextToSpeech() {
     const newSpeechTexts = [...speechTexts];
     newSpeechTexts[id].text = value;
     setSpeechTexts(newSpeechTexts);
-    console.log(speechTexts);
   };
 
   const handleAddSpeech = () => {

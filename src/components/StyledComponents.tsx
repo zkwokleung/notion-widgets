@@ -1,4 +1,4 @@
-import { Card, Grid, TextField } from "@mui/material";
+import { Card, Grid, TextField, styled as muiStyled } from "@mui/material";
 import styled from "styled-components";
 
 export const StyledActionButton = styled.div`
@@ -25,7 +25,8 @@ export const StyledCard = styled(Card)`
   margin: 0rem;
 `;
 
-export const StyledTextField = styled(TextField)`
+// styled-components >=6.5 drops TextField's prop types (untyped onChange), so use MUI's styled here.
+export const StyledTextField = muiStyled(TextField)`
   width: 100%;
   margin: 0.5rem;
 `;
