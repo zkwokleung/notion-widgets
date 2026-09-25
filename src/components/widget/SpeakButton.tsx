@@ -7,12 +7,15 @@ interface SpeakButtonProps {
   text: string;
   lang: string;
   rate?: number;
+  /** What is spoken, for screen readers, e.g. "word" gives "Listen to word". */
+  subject?: string;
 }
 
-function SpeakButton({ text, lang, rate }: SpeakButtonProps) {
+function SpeakButton({ text, lang, rate, subject }: SpeakButtonProps) {
   const { status, speak, stop } = useSpeech();
   const busy = status !== "idle";
-  const label = busy ? "Stop" : "Listen";
+  const tooltip = busy ? "Stop" : "Listen";
+  const label = !subject ? tooltip : busy ? `Stop ${subject}` : `Listen to ${subject}`;
 
   return (
     <Tooltip>
@@ -35,7 +38,7 @@ function SpeakButton({ text, lang, rate }: SpeakButtonProps) {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent>{tooltip}</TooltipContent>
     </Tooltip>
   );
 }

@@ -1,118 +1,131 @@
-import { useState } from "react";
-import { Grid, useMediaQuery, useTheme } from "@mui/material";
-import LanguageSelect from "../../components/LanguageSelect";
-import { StyledTextField } from "../../components/StyledComponents";
-import SpeechPlayer from "../text-to-speech/SpeechPlayer";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useTranslation } from "../../hooks/useTranslation";
-import RemoveButton from "../../components/RemoveButton";
+import { useState, type KeyboardEvent } from "react";
+import { ArrowRight, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import LanguagePicker from "@/components/widget/LanguagePicker";
+import SpeakButton from "@/components/widget/SpeakButton";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useTranslation } from "@/hooks/useTranslation";
+import { cn } from "@/lib/utils";
+import { languageName } from "@/utils/lang";
+
+const TRANSLATE_DELAY_MS = 800;
 
 export interface DictEntryProps {
-  index: number;
-
+  initialText: string;
   from: string;
   to: string;
-  text: string;
-  rate?: number;
-  readOnly?: boolean;
-
-  hideOriginTTSButton?: boolean;
-  hideTranslatedTTSButton?: boolean;
-
-  availableLangs?: string[];
-  fixedLang?: boolean;
-
-  onFromChange?: (value: string, index: number) => void;
-  onToChange?: (value: string, index: number) => void;
-  onTextChange?: (value: string, index: number) => void;
-
-  onRemove?: (index: number) => void;
+  rate: number;
+  showLanguages: boolean;
+  showWordSpeech: boolean;
+  showTranslationSpeech: boolean;
+  readOnly: boolean;
+  autoFocus: boolean;
+  onFromChange: (from: string) => void;
+  onToChange: (to: string) => void;
+  onTextChange: (text: string) => void;
+  onSubmit: () => void;
+  onRemove: () => void;
 }
 
-function DictEntry(props: DictEntryProps) {
-  // Data
-  const [text, setText] = useState(props.text);
-  const textToTranslate = useDebounce(text, 1000);
-  const translatedText = useTranslation(textToTranslate, props.from, props.to);
+function DictEntry({
+  initialText,
+  from,
+  to,
+  rate,
+  showLanguages,
+  showWordSpeech,
+  showTranslationSpeech,
+  readOnly,
+  autoFocus,
+  onFromChange,
+  onToChange,
+  onTextChange,
+  onSubmit,
+  onRemove,
+}: DictEntryProps) {
+  // Local so typing never waits on the config round trip through the host.
+  const [text, setText] = useState(initialText);
+  const debouncedText = useDebounce(text.trim(), TRANSLATE_DELAY_MS);
+  const translation = useTranslation(debouncedText, from, to);
 
-  // UI
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down(1190));
-  const ttsButtonSz = isSmallScreen ? 1 : 0.5;
-  const baseTextFieldSz =
-    (isSmallScreen ? 3.25 : 3.75) + (props.fixedLang ? 1.5 : 0);
-  const originTextFieldSz =
-    baseTextFieldSz + (props.hideOriginTTSButton ? ttsButtonSz : 0);
-  const translatedTextFieldSz =
-    baseTextFieldSz + (props.hideTranslatedTTSButton ? ttsButtonSz : 0);
-
-  // * Handlers
-  const handleFromChange = (value: string) => {
-    props.onFromChange?.(value, props.index);
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    // Enter also confirms IME composition (Japanese, Chinese…); don't treat that as a new row.
+    if (event.key !== "Enter" || event.nativeEvent.isComposing || readOnly) return;
+    event.preventDefault();
+    onSubmit();
   };
-
-  const handleToChange = (value: string) => {
-    props.onToChange?.(value, props.index);
-  };
-
-  const handleTextChange = (value: string) => {
-    setText(value);
-    props.onTextChange?.(value, props.index);
-  };
-
-  function handleRemoveButtonClick(): void {
-    props.onRemove?.(props.index);
-  }
 
   return (
-    <Grid container spacing={1}>
-      {!props.fixedLang && (
-        <>
-          <Grid item xs={1.5}>
-            <LanguageSelect
-              lang={props.from}
-              availableLangs={props.availableLangs}
-              onChange={handleFromChange}
-            />
-          </Grid>
-          <Grid item xs={1.5}>
-            <LanguageSelect
-              lang={props.to}
-              availableLangs={props.availableLangs}
-              onChange={handleToChange}
-            />
-          </Grid>
-        </>
+    <li
+      className={cn(
+        "grid items-center gap-x-1 gap-y-0.5 py-1.5",
+        showLanguages
+          ? "grid-cols-[minmax(0,1fr)_auto] [grid-template-areas:'langs_langs'_'word_remove'_'trans_.'] @lg:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] @lg:[grid-template-areas:'langs_word_trans_remove']"
+          : "grid-cols-[minmax(0,1fr)_auto] [grid-template-areas:'word_remove'_'trans_.'] @lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] @lg:[grid-template-areas:'word_trans_remove']"
+      )}
+    >
+      {showLanguages && (
+        <div className="flex items-center gap-1 pb-1 [grid-area:langs] @lg:pb-0">
+          <LanguagePicker compact value={from} onChange={onFromChange} aria-label="From language" />
+          <ArrowRight aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
+          <LanguagePicker compact value={to} onChange={onToChange} aria-label="To language" />
+        </div>
       )}
 
-      <Grid item xs={originTextFieldSz}>
-        <StyledTextField
-          fullWidth
+      <div className="flex min-w-0 items-center gap-0.5 [grid-area:word]">
+        <Input
           value={text}
-          onChange={(e) => handleTextChange(e.target.value)}
+          lang={from}
+          maxLength={500}
+          autoFocus={autoFocus}
+          placeholder={languageName(from)}
+          aria-label="Word"
+          onChange={(event) => {
+            setText(event.target.value);
+            onTextChange(event.target.value);
+          }}
+          onKeyDown={handleKeyDown}
+          className="border-transparent bg-transparent shadow-none hover:bg-muted/60 focus-visible:bg-background dark:bg-transparent"
         />
-      </Grid>
-      {!props.hideOriginTTSButton && (
-        <Grid item xs={ttsButtonSz}>
-          <SpeechPlayer lang={props.from} text={props.text} rate={props.rate} />
-        </Grid>
-      )}
+        {showWordSpeech && <SpeakButton text={text.trim()} lang={from} rate={rate} subject="word" />}
+      </div>
 
-      <Grid item xs={translatedTextFieldSz}>
-        <StyledTextField disabled fullWidth value={translatedText} />
-      </Grid>
-      {!props.hideTranslatedTTSButton && (
-        <Grid item xs={ttsButtonSz}>
-          <SpeechPlayer lang={props.to} text={translatedText} rate={props.rate} />
-        </Grid>
-      )}
+      <div className="flex min-w-0 items-center gap-0.5 [grid-area:trans]">
+        <p className="min-h-8 min-w-0 flex-1 px-2.5 py-1.5 text-sm break-words">
+          <span className="sr-only">Translation: </span>
+          {translation ? (
+            <span lang={to}>{translation}</span>
+          ) : (
+            <span aria-hidden className="text-muted-foreground/60">
+              {text.trim() ? "…" : "—"}
+            </span>
+          )}
+        </p>
+        {showTranslationSpeech && <SpeakButton text={translation} lang={to} rate={rate} subject="translation" />}
+      </div>
 
-      {!props.readOnly && (
-        <Grid item xs={0.5}>
-          <RemoveButton onClick={handleRemoveButtonClick} />
-        </Grid>
+      {!readOnly && (
+        <div className="self-start [grid-area:remove] @lg:self-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Remove word"
+                onClick={onRemove}
+                className="text-muted-foreground opacity-60 hover:opacity-100 focus-visible:opacity-100"
+              >
+                <X />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Remove word</TooltipContent>
+          </Tooltip>
+        </div>
       )}
-    </Grid>
+    </li>
   );
 }
 

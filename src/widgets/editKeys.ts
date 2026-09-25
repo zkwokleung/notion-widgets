@@ -1,3 +1,5 @@
+import { currentDisplaySearch } from "../lib/display";
+
 const storageKey = (id: string) => `notion-widgets:edit-key:${id}`;
 
 export function editKeyFromHash(hash: string): string | undefined {
@@ -22,8 +24,21 @@ export function rememberEditKey(id: string, editKey: string): void {
   }
 }
 
-export function savedWidgetUrl(id: string, editKey?: string): string {
-  const url = new URL(`/w/${encodeURIComponent(id)}`, window.location.origin);
-  if (editKey) url.hash = new URLSearchParams({ key: editKey }).toString();
-  return url.toString();
+/** Root-relative path to a saved widget; `display` carries theme/bg params onto the link. */
+export function savedWidgetPath(
+  id: string,
+  editKey?: string,
+  display: URLSearchParams = currentDisplaySearch()
+): string {
+  const query = display.toString();
+  const hash = editKey ? `#${new URLSearchParams({ key: editKey })}` : "";
+  return `/w/${encodeURIComponent(id)}${query ? `?${query}` : ""}${hash}`;
+}
+
+export function savedWidgetUrl(
+  id: string,
+  editKey?: string,
+  display: URLSearchParams = currentDisplaySearch()
+): string {
+  return new URL(savedWidgetPath(id, editKey, display), window.location.origin).toString();
 }

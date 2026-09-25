@@ -1,42 +1,23 @@
-import WidgetCard from "./WidgetCard";
-import AutoLayout from "../../components/AutoLayout";
-import { AppBar, Box, Toolbar, Typography } from "@mui/material";
-import styled from "styled-components";
-
 import { widgetDefinitions } from "../../widgets/registry";
-
-const StyledBody = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #0a0a0a;
-
-  height: 100vh;
-  width: 100vw;
-`;
+import WidgetCard from "./WidgetCard";
 
 function Home() {
   return (
-    <>
-      <AppBar position="static" elevation={0}>
-        <Toolbar>
-          <Typography>Notion Widgets</Typography>
-        </Toolbar>
-      </AppBar>
-      <StyledBody>
-        <Box
-          sx={{
-            margin: "10px",
-          }}
-        >
-          <AutoLayout>
-            {widgetDefinitions.map(({ type, title, Icon }) => (
-              <WidgetCard key={type} title={title} link={`/${type}`} avatar={<Icon />} />
-            ))}
-          </AutoLayout>
-        </Box>
-      </StyledBody>
-    </>
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-4 py-12 text-sm sm:px-8 sm:py-16">
+      <header className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight">Notion Widgets</h1>
+        <p className="text-base text-muted-foreground">
+          Small language-learning tools you can embed in any Notion page.
+        </p>
+      </header>
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {widgetDefinitions.map((widget) => (
+          <li key={widget.type}>
+            <WidgetCard widget={widget} />
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }
 

@@ -27,10 +27,16 @@ function stubSpeechSynthesis(voiceLangs: string[]) {
   return { spoken, synth };
 }
 
+let useSpeechModule: typeof import("./useSpeech");
+
 async function loadHook() {
   vi.resetModules();
-  const { useSpeech } = await import("./useSpeech");
-  return renderHook(() => useSpeech());
+  useSpeechModule = await import("./useSpeech");
+  return renderHook(() => useSpeechModule.useSpeech());
+}
+
+function renderHookFromSameModule() {
+  return renderHook(() => useSpeechModule.useSpeech());
 }
 
 describe("useSpeech", () => {
@@ -44,7 +50,7 @@ describe("useSpeech", () => {
 
     let done = false;
     act(() => {
-      void result.current.speak("bonjour", "fr", 0.8).then(() => (done = true));
+      void result.current.speak("bonjour", "fr", 0.8).then((completed) => (done = completed));
     });
 
     expect(spoken).toHaveLength(1);
@@ -83,5 +89,25 @@ describe("useSpeech", () => {
 
     expect(created).toEqual(["/api/tts?q=%E6%B0%B4&tl=ja"]);
     expect(result.current.status).toBe("loading");
+  });
+
+  it("stops other speech when a new one starts and reports the interruption", async () => {
+    const { spoken, synth } = stubSpeechSynthesis(["fr-FR"]);
+    const { result: first } = await loadHook();
+    const { result: second } = renderHookFromSameModule();
+
+    let firstOutcome: boolean | undefined;
+    act(() => {
+      void first.current.speak("un", "fr").then((completed) => (firstOutcome = completed));
+    });
+    await act(async () => {
+      void second.current.speak("deux", "fr");
+    });
+
+    expect(firstOutcome).toBe(false);
+    expect(synth.cancel).toHaveBeenCalled();
+    expect(spoken.map((utterance) => utterance.text)).toEqual(["un", "deux"]);
+    expect(first.current.status).toBe("idle");
+    expect(second.current.status).toBe("loading");
   });
 });

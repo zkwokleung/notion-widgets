@@ -1,17 +1,15 @@
-import { Save as SaveIcon } from "@mui/icons-material";
-import { Button } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
+import { LoaderCircle, Save } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import CopyLinkButton from "@/components/widget/CopyLinkButton";
 import { createWidget } from "../../api/client";
-import CopyLinkButton from "../../components/CopyLinkButton";
-import { decodeConfig, encodeConfig } from "../../widgets/configCodec";
-import { rememberEditKey } from "../../widgets/editKeys";
-import {
-  defaultConfig,
-  parseConfig,
-  type RegisteredWidget,
-} from "../../widgets/registry";
+import { decodeConfig, withConfig } from "../../widgets/configCodec";
+import { rememberEditKey, savedWidgetPath } from "../../widgets/editKeys";
+import { defaultConfig, parseConfig, type RegisteredWidget } from "../../widgets/registry";
+import { displaySearchOf } from "../displayParams";
 import WidgetFrame from "./WidgetFrame";
 
 /** An unsaved widget whose whole config lives in the `?c=` query param. */
@@ -28,27 +26,29 @@ function UrlWidgetPage({ widget }: { widget: RegisteredWidget }) {
     mutationFn: () => createWidget(widget.type, config),
     onSuccess: ({ id, editKey }) => {
       rememberEditKey(id, editKey);
-      void navigate(`/w/${id}#key=${editKey}`);
+      void navigate(savedWidgetPath(id, editKey, displaySearchOf(searchParams)));
     },
+    onError: () => toast.error("Couldn't save the widget. Try again."),
   });
 
   return (
     <WidgetFrame
       widget={widget}
       config={config}
-      onChange={(next) => setSearchParams(encodeConfig(next), { replace: true })}
+      onChange={(next) => setSearchParams((prev) => withConfig(prev, next), { replace: true })}
       readOnly={false}
       toolbar={
         <>
           <CopyLinkButton label="Copy link" url={window.location.href} />
           <Button
-            size="small"
-            variant="contained"
-            startIcon={<SaveIcon />}
+            type="button"
+            size="sm"
+            variant="secondary"
             disabled={saveWidget.isPending}
             onClick={() => saveWidget.mutate()}
           >
-            {saveWidget.isError ? "Save failed — retry" : "Save widget"}
+            {saveWidget.isPending ? <LoaderCircle className="animate-spin" /> : <Save />}
+            Save widget
           </Button>
         </>
       }

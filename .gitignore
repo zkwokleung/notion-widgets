@@ -29,3 +29,6 @@ yarn-error.log*
 !.dev.vars.example
 *.tsbuildinfo
 storybook-static
+/test-results
+/playwright-report
+/playwright/.cache

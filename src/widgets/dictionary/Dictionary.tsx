@@ -1,37 +1,45 @@
 import { useState } from "react";
+import { BookOpen, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { languageFlag, languageName } from "@/utils/lang";
 import type { DictWord, DictionaryConfig } from "../../../shared/widgetConfigs";
-import {
-  StyledActionButton,
-  StyledActionLayout,
-  StyledCard,
-} from "../../components/StyledComponents";
-import DictEntry from "./DictEntry";
-import { Add as AddIcon } from "@mui/icons-material";
-import OptionsButton from "../../components/OptionsButton";
-import { Box, Stack } from "@mui/material";
-import DictOptionMenu from "./DictOptionMenu";
 import type { WidgetProps } from "../registry";
+import DictEntry from "./DictEntry";
+import DictionarySettings from "./DictionarySettings";
 
 const DEFAULT_PAIR = { from: "fr", to: "en" };
 
+function LanguagePair({ from, to }: { from: string; to: string }) {
+  return (
+    <p className="truncate text-sm text-muted-foreground">
+      <span aria-hidden>{languageFlag(from)} </span>
+      {languageName(from)}
+      <span aria-hidden> → </span>
+      <span className="sr-only"> to </span>
+      <span aria-hidden>{languageFlag(to)} </span>
+      {languageName(to)}
+    </p>
+  );
+}
+
 function Dictionary({ config, onChange, readOnly }: WidgetProps<DictionaryConfig>) {
   const { fixedLang, words } = config;
-  const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
+  const [focusId, setFocusId] = useState<string | null>(null);
 
   const update = (patch: Partial<DictionaryConfig>) => onChange({ ...config, ...patch });
 
-  const updateWord = (index: number, patch: Partial<DictWord>) => {
-    update({ words: words.map((word, i) => (i === index ? { ...word, ...patch } : word)) });
+  const updateWord = (id: string, patch: Partial<DictWord>) => {
+    update({ words: words.map((word) => (word.id === id ? { ...word, ...patch } : word)) });
   };
 
-  const handleAddWord = () => {
-    const pair = fixedLang ?? words.at(-1) ?? DEFAULT_PAIR;
-    update({
-      words: [...words, { id: crypto.randomUUID(), from: pair.from, to: pair.to, text: "" }],
-    });
+  const insertWord = (index: number) => {
+    const pair = fixedLang ?? words[index - 1] ?? words.at(-1) ?? DEFAULT_PAIR;
+    const word: DictWord = { id: crypto.randomUUID(), from: pair.from, to: pair.to, text: "" };
+    update({ words: words.toSpliced(index, 0, word) });
+    setFocusId(word.id);
   };
 
-  const handleFixedLangChange = (enabled: boolean) => {
+  const handleFixedLangToggle = (enabled: boolean) => {
     if (enabled) {
       update({ fixedLang: words[0] ? { from: words[0].from, to: words[0].to } : DEFAULT_PAIR });
     } else {
@@ -44,56 +52,82 @@ function Dictionary({ config, onChange, readOnly }: WidgetProps<DictionaryConfig
     }
   };
 
-  return (
-    <>
-      <StyledCard>
-        <Stack direction="column" spacing={2}>
-          {words.map((word, i) => (
-            <DictEntry
-              key={word.id}
-              index={i}
-              hideOriginTTSButton={config.hideOriginTTS}
-              hideTranslatedTTSButton={config.hideTranslatedTTS}
-              from={fixedLang?.from ?? word.from}
-              to={fixedLang?.to ?? word.to}
-              text={word.text}
-              rate={config.rate}
-              fixedLang={!!fixedLang}
-              readOnly={readOnly}
-              onFromChange={(from, index) => updateWord(index, { from })}
-              onToChange={(to, index) => updateWord(index, { to })}
-              onTextChange={(text, index) => updateWord(index, { text })}
-              onRemove={(index) => update({ words: words.filter((_, j) => j !== index) })}
-            />
-          ))}
-        </Stack>
-        {!readOnly && (
-          <StyledActionLayout>
-            <StyledActionButton onClick={handleAddWord}>
-              <AddIcon />
-            </StyledActionButton>
-            <Box sx={{ marginLeft: "auto" }}>
-              <OptionsButton onClick={() => setOptionsMenuOpen(true)} />
-            </Box>
-          </StyledActionLayout>
-        )}
-      </StyledCard>
+  const addButton = (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      aria-label="Add word"
+      onClick={() => insertWord(words.length)}
+      className="text-muted-foreground"
+    >
+      <Plus />
+      Add word
+    </Button>
+  );
 
-      <DictOptionMenu
-        open={optionsMenuOpen}
-        onClose={() => setOptionsMenuOpen(false)}
-        fixedLang={!!fixedLang}
-        hideOriginTTSBtn={config.hideOriginTTS}
-        hideTranslatedTTSBtn={config.hideTranslatedTTS}
-        from={fixedLang?.from}
-        to={fixedLang?.to}
-        onHideOriginTTSBtnChange={(hideOriginTTS) => update({ hideOriginTTS })}
-        onHideTranslatedTTSBtnChange={(hideTranslatedTTS) => update({ hideTranslatedTTS })}
-        onFixedLangChange={handleFixedLangChange}
-        onFromChange={(from) => fixedLang && update({ fixedLang: { ...fixedLang, from } })}
-        onToChange={(to) => fixedLang && update({ fixedLang: { ...fixedLang, to } })}
-      />
-    </>
+  return (
+    <div className="@container flex flex-col bg-background text-sm text-foreground">
+      {(fixedLang || !readOnly) && (
+        <header className="flex min-h-9 items-center gap-2 border-b border-border pb-1">
+          <div className="min-w-0 flex-1">
+            {fixedLang && <LanguagePair from={fixedLang.from} to={fixedLang.to} />}
+          </div>
+          {!readOnly && (
+            <DictionarySettings
+              config={config}
+              onHideOriginTTSChange={(hideOriginTTS) => update({ hideOriginTTS })}
+              onHideTranslatedTTSChange={(hideTranslatedTTS) => update({ hideTranslatedTTS })}
+              onFixedLangToggle={handleFixedLangToggle}
+              onFixedLangChange={(pair) => update({ fixedLang: pair })}
+              onRateChange={(rate) => update({ rate })}
+            />
+          )}
+        </header>
+      )}
+
+      {words.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+          <BookOpen aria-hidden className="size-5 text-muted-foreground" />
+          <p className="text-muted-foreground">
+            {readOnly
+              ? "This dictionary has no words yet."
+              : "Add words to build your vocabulary list. Translations appear as you type."}
+          </p>
+          {!readOnly && addButton}
+        </div>
+      ) : (
+        <>
+          <ul aria-label="Words" className="divide-y divide-border">
+            {words.map((word, index) => (
+              <DictEntry
+                key={word.id}
+                initialText={word.text}
+                from={fixedLang?.from ?? word.from}
+                to={fixedLang?.to ?? word.to}
+                rate={config.rate}
+                showLanguages={!fixedLang}
+                showWordSpeech={!config.hideOriginTTS}
+                showTranslationSpeech={!config.hideTranslatedTTS}
+                readOnly={readOnly}
+                autoFocus={word.id === focusId}
+                onFromChange={(from) => updateWord(word.id, { from })}
+                onToChange={(to) => updateWord(word.id, { to })}
+                onTextChange={(text) => updateWord(word.id, { text })}
+                onSubmit={() => insertWord(index + 1)}
+                onRemove={() => update({ words: words.filter(({ id }) => id !== word.id) })}
+              />
+            ))}
+          </ul>
+          <footer className="flex min-h-9 items-center gap-2 border-t border-border pt-1">
+            {!readOnly && addButton}
+            <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+              {words.length} {words.length === 1 ? "word" : "words"}
+            </span>
+          </footer>
+        </>
+      )}
+    </div>
   );
 }
 

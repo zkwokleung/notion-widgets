@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   translatorConfigSchema,
   type TranslatorConfig,
@@ -10,7 +11,11 @@ function StatefulTranslator({ readOnly }: { readOnly: boolean }) {
   const [config, setConfig] = useState<TranslatorConfig>(() =>
     translatorConfigSchema.parse({})
   );
-  return <Translator config={config} onChange={setConfig} readOnly={readOnly} />;
+  return (
+    <TooltipProvider>
+      <Translator config={config} onChange={setConfig} readOnly={readOnly} />
+    </TooltipProvider>
+  );
 }
 
 const meta = {

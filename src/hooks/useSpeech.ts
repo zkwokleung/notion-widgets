@@ -18,10 +18,14 @@ function findVoice(lang: string): SpeechSynthesisVoice | undefined {
   );
 }
 
+// Only one thing speaks at a time across the page; starting speech stops the rest.
+let stopActive: (() => void) | null = null;
+
 /**
  * Speaks with a browser voice when one exists for the language, otherwise
- * streams Google TTS through the Worker. `speak` resolves once playback ends
- * or is stopped, so callers can chain entries.
+ * streams Google TTS through the Worker. `speak` resolves to true when playback
+ * finishes on its own and false when it's stopped or interrupted, so callers
+ * chaining entries know when to stop.
  */
 export function useSpeech() {
   const [status, setStatus] = useState<SpeechStatus>("idle");
@@ -34,18 +38,26 @@ export function useSpeech() {
 
   const speak = useCallback(
     (text: string, lang: string, rate = 1) =>
-      new Promise<void>((resolve) => {
-        stop();
-        if (!text || !lang) return resolve();
+      new Promise<boolean>((resolve) => {
+        stopActive?.();
+        if (!text || !lang) return resolve(false);
 
         let finished = false;
-        const finish = () => {
+        const finish = (completed: boolean) => {
           if (finished) return;
           finished = true;
           stopCurrent.current = null;
+          if (stopActive === interrupt) stopActive = null;
           setStatus("idle");
-          resolve();
+          resolve(completed);
         };
+        let cancelPlayback = () => {};
+        const interrupt = () => {
+          finish(false);
+          cancelPlayback();
+        };
+        stopCurrent.current = interrupt;
+        stopActive = interrupt;
         setStatus("loading");
 
         const voice = findVoice(lang);
@@ -55,12 +67,9 @@ export function useSpeech() {
           utterance.lang = voice.lang;
           utterance.rate = rate;
           utterance.onstart = () => setStatus("playing");
-          utterance.onend = finish;
-          utterance.onerror = finish;
-          stopCurrent.current = () => {
-            finish();
-            synth.cancel();
-          };
+          utterance.onend = () => finish(true);
+          utterance.onerror = () => finish(false);
+          cancelPlayback = () => synth.cancel();
           synth.speak(utterance);
           return;
         }
@@ -68,15 +77,12 @@ export function useSpeech() {
         const audio = new Audio(ttsUrl(text, lang));
         audio.playbackRate = rate;
         audio.onplaying = () => setStatus("playing");
-        audio.onended = finish;
-        audio.onerror = finish;
-        stopCurrent.current = () => {
-          finish();
-          audio.pause();
-        };
-        audio.play().catch(finish);
+        audio.onended = () => finish(true);
+        audio.onerror = () => finish(false);
+        cancelPlayback = () => audio.pause();
+        audio.play().catch(() => finish(false));
       }),
-    [stop]
+    []
   );
 
   useEffect(() => {

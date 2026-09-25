@@ -2,7 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* A .light ancestor (e.g. the builder preview) opts back out of an outer .dark. */
+@custom-variant dark (&:where(.dark, .dark *):not(:where(.light, .light *)));
 
 @theme inline {
   /* Notion's own UI font stack, so widgets blend into the page around them. */
@@ -38,7 +39,8 @@
 }
 
 /* Colors follow Notion's light and dark themes. */
-:root {
+:root,
+.light {
   --radius: 0.5rem;
   --background: #ffffff;
   --foreground: #37352f;

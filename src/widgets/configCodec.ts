@@ -12,10 +12,15 @@ function fromBase64Url(value: string): Uint8Array {
 }
 
 export function encodeConfig(config: unknown): URLSearchParams {
+  return withConfig(new URLSearchParams(), config);
+}
+
+/** A copy of `search` with the config set, keeping every other param (e.g. display options). */
+export function withConfig(search: URLSearchParams, config: unknown): URLSearchParams {
+  const next = new URLSearchParams(search);
   const json = JSON.stringify(config);
-  return new URLSearchParams({
-    [CONFIG_PARAM]: toBase64Url(new TextEncoder().encode(json)),
-  });
+  next.set(CONFIG_PARAM, toBase64Url(new TextEncoder().encode(json)));
+  return next;
 }
 
 /** Returns undefined when the param is missing or unreadable. */

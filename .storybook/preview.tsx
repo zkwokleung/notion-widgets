@@ -1,21 +1,30 @@
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import type { Preview } from "@storybook/react-vite";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
+import { createQueryClient } from "../src/api/queryClient";
+import { TooltipProvider } from "../src/components/ui/tooltip";
+import "../src/index.css";
 
-const darkTheme = createTheme({ palette: { mode: "dark" } });
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
 
 const preview: Preview = {
+  globalTypes: {
+    theme: {
+      description: "Notion theme",
+      toolbar: { title: "Theme", items: ["light", "dark"], dynamicTitle: true },
+    },
+  },
+  initialGlobals: { theme: "light" },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={darkTheme}>
-          <CssBaseline />
+        <TooltipProvider>
           <MemoryRouter>
-            <Story />
+            <div className={`${context.globals.theme} bg-background p-4 text-foreground`}>
+              <Story />
+            </div>
           </MemoryRouter>
-        </ThemeProvider>
+        </TooltipProvider>
       </QueryClientProvider>
     ),
   ],
