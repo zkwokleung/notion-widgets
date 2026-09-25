@@ -53,6 +53,12 @@ export const timerConfigSchema = z.object({
   sessionsBeforeLongBreak: z.number().int().min(1).max(12).default(4),
 });
 
+export const whiteboardConfigSchema = z.object({
+  lang: langCodeSchema.default("ja"),
+  translateTo: langCodeSchema.default("en"),
+  text: z.string().max(500).default(""),
+});
+
 export type TranslatorConfig = z.infer<typeof translatorConfigSchema>;
 export type SpeechEntry = z.infer<typeof speechEntrySchema>;
 export type TextToSpeechConfig = z.infer<typeof textToSpeechConfigSchema>;
@@ -60,12 +66,14 @@ export type ReviewState = z.infer<typeof reviewStateSchema>;
 export type DictWord = z.infer<typeof dictWordSchema>;
 export type DictionaryConfig = z.infer<typeof dictionaryConfigSchema>;
 export type TimerConfig = z.infer<typeof timerConfigSchema>;
+export type WhiteboardConfig = z.infer<typeof whiteboardConfigSchema>;
 
 export const widgetConfigSchemas = {
   translator: translatorConfigSchema,
   "text-to-speech": textToSpeechConfigSchema,
   dictionary: dictionaryConfigSchema,
   timer: timerConfigSchema,
+  whiteboard: whiteboardConfigSchema,
 } satisfies Record<WidgetType, z.ZodType>;
 
 export type WidgetConfigMap = {
@@ -77,6 +85,7 @@ export const createWidgetBodySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("text-to-speech"), config: textToSpeechConfigSchema }),
   z.object({ type: z.literal("dictionary"), config: dictionaryConfigSchema }),
   z.object({ type: z.literal("timer"), config: timerConfigSchema }),
+  z.object({ type: z.literal("whiteboard"), config: whiteboardConfigSchema }),
 ]);
 
 export const updateWidgetBodySchema = z.object({ config: z.unknown() });

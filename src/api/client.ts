@@ -2,6 +2,7 @@ import {
   EDIT_KEY_HEADER,
   type ApiError,
   type CreateWidgetResponse,
+  type HandwritingResponse,
   type TranslateResponse,
   type WidgetDocument,
   type WidgetType,
@@ -44,6 +45,23 @@ export async function translate(
     { signal }
   );
   return translated;
+}
+
+export type Stroke = [xs: number[], ys: number[], times: number[]];
+
+export async function recognizeHandwriting(
+  lang: string,
+  size: { width: number; height: number },
+  strokes: Stroke[],
+  signal?: AbortSignal
+): Promise<string[]> {
+  const { candidates } = await request<HandwritingResponse>("/api/handwriting", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ lang, ...size, strokes }),
+    signal,
+  });
+  return candidates;
 }
 
 export function ttsUrl(text: string, lang: string): string {

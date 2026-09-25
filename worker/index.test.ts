@@ -66,6 +66,38 @@ describe("GET /api/tts", () => {
   });
 });
 
+describe("POST /api/handwriting", () => {
+  const ink = { lang: "zh-TW", width: 200, height: 200, strokes: [[[10, 90], [50, 50], [0, 20]]] };
+
+  it("forwards strokes to Input Tools and returns candidates", async () => {
+    const { env, ctx } = createTestEnv();
+    const fetchMock = mockUpstream(
+      Response.json(["SUCCESS", [["id", ["十", "+", "t"], [], {}]]])
+    );
+    const res = await app.request(
+      "/api/handwriting",
+      { method: "POST", body: JSON.stringify(ink), headers: { "Content-Type": "application/json" } },
+      env,
+      ctx
+    );
+
+    expect(await res.json()).toEqual({ candidates: ["十", "+", "t"] });
+    const sent = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(sent.requests[0]).toMatchObject({ language: "zh_TW", ink: ink.strokes });
+  });
+
+  it("rejects malformed ink", async () => {
+    const { env, ctx } = createTestEnv();
+    const res = await app.request(
+      "/api/handwriting",
+      { method: "POST", body: JSON.stringify({ ...ink, strokes: [] }) },
+      env,
+      ctx
+    );
+    expect(res.status).toBe(400);
+  });
+});
+
 describe("/api/widgets", () => {
   const json = (body: unknown, headers: Record<string, string> = {}) => ({
     body: JSON.stringify(body),

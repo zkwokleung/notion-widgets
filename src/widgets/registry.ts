@@ -1,4 +1,4 @@
-import { BookOpen, Languages, Timer as TimerIcon, Volume2 } from "lucide-react";
+import { BookOpen, Languages, PenLine, Timer as TimerIcon, Volume2 } from "lucide-react";
 import { lazy, type ComponentType } from "react";
 import type { z } from "zod";
 import type { WidgetType } from "../../shared/api";
@@ -70,6 +70,14 @@ export const widgetDefinitions: RegisteredWidget[] = [
     Icon: TimerIcon,
     schema: widgetConfigSchemas.timer,
     Component: lazy(() => import("./timer/Timer")),
+  }),
+  defineWidget({
+    type: "whiteboard",
+    title: "Handwriting",
+    description: "Write characters by hand, then translate and hear them.",
+    Icon: PenLine,
+    schema: widgetConfigSchemas.whiteboard,
+    Component: lazy(() => import("./whiteboard/Whiteboard")),
   }),
 ];
 

@@ -5,6 +5,7 @@ export const WIDGET_TYPES = [
   "text-to-speech",
   "dictionary",
   "timer",
+  "whiteboard",
 ] as const;
 
 export type WidgetType = (typeof WIDGET_TYPES)[number];
@@ -15,6 +16,13 @@ export const MAX_TTS_CHARS = 200;
 export const MAX_CONFIG_BYTES = 64 * 1024;
 
 export const langCodeSchema = z.string().regex(/^[a-zA-Z]{2,3}(-[a-zA-Z]{2,4})?$/);
+
+export const MAX_HANDWRITING_STROKES = 200;
+export const MAX_STROKE_POINTS = 2000;
+
+export interface HandwritingResponse {
+  candidates: string[];
+}
 
 export interface TranslateResponse {
   text: string;
