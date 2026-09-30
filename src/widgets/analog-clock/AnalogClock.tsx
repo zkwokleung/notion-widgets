@@ -1,17 +1,20 @@
+import { Settings2 } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { useNow } from "@/hooks/useNow";
 import { cn } from "@/lib/utils";
 import type { AnalogClockConfig } from "../../../shared/widgetConfigs";
 import { accentVars, FONTS, loadFont } from "../appearance";
 import type { WidgetProps } from "../registry";
 import { cityName, formatDate, formatTime, localTime, nextTickDelay, viewerTimeZone } from "../world-clock/zones";
+import AnalogClockSettings from "./AnalogClockSettings";
 import Dial from "./Dial";
 import { FACES, handAngles } from "./faces";
 
 type Size = AnalogClockConfig["size"];
 
 const DIAL_WIDTH: Record<Size, string> = { sm: "max-w-36", md: "max-w-52", lg: "max-w-72" };
-function AnalogClock({ config }: WidgetProps<AnalogClockConfig>) {
+function AnalogClock({ config, onChange, readOnly }: WidgetProps<AnalogClockConfig>) {
   const { face, showSeconds, showDigital, showDate, font, color, size } = config;
   const zone = useMemo(() => config.timeZone ?? viewerTimeZone(), [config.timeZone]);
   const spec = FACES[face];
@@ -58,6 +61,14 @@ function AnalogClock({ config }: WidgetProps<AnalogClockConfig>) {
           </div>
         )}
       </div>
+
+      {!readOnly && (
+        <AnalogClockSettings config={config} onChange={onChange}>
+          <Button type="button" variant="ghost" size="icon-xs" aria-label="Analog clock settings">
+            <Settings2 />
+          </Button>
+        </AnalogClockSettings>
+      )}
     </div>
   );
 }
