@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CalendarClock,
+  Clock,
   Globe,
   Hourglass,
   Languages,
@@ -111,6 +112,14 @@ export const widgetDefinitions: RegisteredWidget[] = [
     Icon: Globe,
     schema: widgetConfigSchemas["world-clock"],
     Component: lazy(() => import("./world-clock/WorldClock")),
+  }),
+  defineWidget({
+    type: "analog-clock",
+    title: "Analog Clock",
+    description: "A clock with hands, in the face style you like.",
+    Icon: Clock,
+    schema: widgetConfigSchemas["analog-clock"],
+    Component: lazy(() => import("./analog-clock/AnalogClock")),
   }),
 ];
 

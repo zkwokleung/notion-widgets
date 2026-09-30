@@ -158,6 +158,20 @@ export const worldClockConfigSchema = z.object({
   ...appearanceFields,
 });
 
+export const CLOCK_FACES = ["classic", "minimal", "modern", "roman", "station"] as const;
+
+export const analogClockConfigSchema = z.object({
+  title: z.string().max(80).default(""),
+  /** null follows the viewer's time zone. */
+  timeZone: z.string().max(64).refine(isValidTimeZone, "Unknown time zone").nullable().default(null),
+  face: z.enum(CLOCK_FACES).default("classic"),
+  showSeconds: z.boolean().default(true),
+  showDigital: z.boolean().default(false),
+  showDate: z.boolean().default(false),
+  ...appearanceFields,
+  color: appearanceFields.color.default("red"),
+});
+
 export type TranslatorConfig = z.infer<typeof translatorConfigSchema>;
 export type SpeechEntry = z.infer<typeof speechEntrySchema>;
 export type TextToSpeechConfig = z.infer<typeof textToSpeechConfigSchema>;
@@ -170,6 +184,8 @@ export type CountdownConfig = z.infer<typeof countdownConfigSchema>;
 export type YearProgressConfig = z.infer<typeof yearProgressConfigSchema>;
 export type WorldClockConfig = z.infer<typeof worldClockConfigSchema>;
 export type Clock = z.infer<typeof clockSchema>;
+export type AnalogClockConfig = z.infer<typeof analogClockConfigSchema>;
+export type ClockFace = (typeof CLOCK_FACES)[number];
 export type ProgressPeriod = (typeof PROGRESS_PERIODS)[number];
 export type Appearance = z.infer<typeof appearanceSchema>;
 export type WidgetFont = (typeof WIDGET_FONTS)[number];
@@ -184,6 +200,7 @@ export const widgetConfigSchemas = {
   countdown: countdownConfigSchema,
   "year-progress": yearProgressConfigSchema,
   "world-clock": worldClockConfigSchema,
+  "analog-clock": analogClockConfigSchema,
 } satisfies Record<WidgetType, z.ZodType>;
 
 export type WidgetConfigMap = {
@@ -199,6 +216,7 @@ export const createWidgetBodySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("countdown"), config: countdownConfigSchema }),
   z.object({ type: z.literal("year-progress"), config: yearProgressConfigSchema }),
   z.object({ type: z.literal("world-clock"), config: worldClockConfigSchema }),
+  z.object({ type: z.literal("analog-clock"), config: analogClockConfigSchema }),
 ]);
 
 export const updateWidgetBodySchema = z.object({ config: z.unknown() });

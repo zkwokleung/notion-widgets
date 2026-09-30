@@ -118,8 +118,19 @@ function wallClockMinutes(now: number, zone: string): number {
   return Date.UTC(part("year"), part("month") - 1, part("day"), hour, part("minute")) / MINUTE_MS;
 }
 
+export interface LocalTime {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
+export function localTime(now: number, zone: string): LocalTime {
+  const total = wallClockMinutes(now, zone);
+  return { hours: Math.floor(total / 60) % 24, minutes: total % 60, seconds: Math.floor(now / SECOND_MS) % 60 };
+}
+
 export function localHour(now: number, zone: string): number {
-  return Math.floor(wallClockMinutes(now, zone) / 60) % 24;
+  return localTime(now, zone).hours;
 }
 
 export function isDaytime(now: number, zone: string): boolean {

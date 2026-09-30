@@ -9,6 +9,7 @@ export const WIDGET_TYPES = [
   "countdown",
   "year-progress",
   "world-clock",
+  "analog-clock",
 ] as const;
 
 export type WidgetType = (typeof WIDGET_TYPES)[number];
