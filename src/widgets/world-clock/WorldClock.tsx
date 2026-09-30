@@ -1,5 +1,6 @@
-import { Moon, Sun } from "lucide-react";
+import { Moon, Settings2, Sun } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { useNow } from "@/hooks/useNow";
 import { cn } from "@/lib/utils";
 import type { Clock, WorldClockConfig } from "../../../shared/widgetConfigs";
@@ -16,6 +17,7 @@ import {
   offsetLabel,
   viewerTimeZone,
 } from "./zones";
+import WorldClockSettings from "./WorldClockSettings";
 
 type Size = WorldClockConfig["size"];
 
@@ -80,7 +82,7 @@ function GridRow(props: RowProps) {
   );
 }
 
-function WorldClock({ config }: WidgetProps<WorldClockConfig>) {
+function WorldClock({ config, onChange, readOnly }: WidgetProps<WorldClockConfig>) {
   const { clocks, layout, showSeconds, font, color } = config;
   const base = useMemo(() => viewerTimeZone(), []);
 
@@ -120,6 +122,14 @@ function WorldClock({ config }: WidgetProps<WorldClockConfig>) {
           </li>
         ))}
       </ul>
+
+      {!readOnly && (
+        <WorldClockSettings config={config} onChange={onChange}>
+          <Button type="button" variant="ghost" size="icon-xs" aria-label="World clock settings">
+            <Settings2 />
+          </Button>
+        </WorldClockSettings>
+      )}
     </div>
   );
 }

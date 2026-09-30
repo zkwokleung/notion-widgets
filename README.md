@@ -13,7 +13,7 @@ re-copied after you edit it.
 | **Handwriting** | Draw characters you can't type yet (kanji, hanzi, hangul…), then translate and hear them. |
 | **Countdown** | Count down to a date (or up from it), with your choice of layout, units, font, size and colour. |
 | **Year Progress** | How far through the year, quarter, month, week or day you are, as bars, rings or dots. |
-| **Year Progress** | How far through the year, quarter, month, week or day you are, as bars, rings or dots. |
+| **World Clock** | The current time in the places you care about, with the difference from your own. |
 
 ## Embedding in Notion
 
