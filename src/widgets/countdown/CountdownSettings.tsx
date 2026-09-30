@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,16 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import AppearanceFields from "@/components/widget/AppearanceFields";
+import SettingChoice, { type ChoiceOption } from "@/components/widget/SettingChoice";
+import SettingField from "@/components/widget/SettingField";
 import SettingSwitch from "@/components/widget/SettingSwitch";
-import { cn } from "@/lib/utils";
-import {
-  COUNTDOWN_COLORS,
-  COUNTDOWN_FONTS,
-  type CountdownConfig,
-} from "../../../shared/widgetConfigs";
+import type { CountdownConfig } from "../../../shared/widgetConfigs";
 import { encodeTarget, isSharedInstant, resolveTarget, toLocalInput } from "./duration";
-import { accentVars, COLORS, FONTS, isPresetColor } from "./styles";
 
 interface CountdownSettingsProps {
   config: CountdownConfig;
@@ -34,98 +30,33 @@ interface CountdownSettingsProps {
   children: ReactNode;
 }
 
-interface Option<T extends string> {
-  value: T;
-  label: string;
-}
-
-const afterEndOptions: Option<CountdownConfig["afterEnd"]>[] = [
+const afterEndOptions: ChoiceOption<CountdownConfig["afterEnd"]>[] = [
   { value: "message", label: "Show a message" },
   { value: "countUp", label: "Count up" },
 ];
-const layoutOptions: Option<CountdownConfig["layout"]>[] = [
+const layoutOptions: ChoiceOption<CountdownConfig["layout"]>[] = [
   { value: "tiles", label: "Tiles" },
   { value: "plain", label: "Plain" },
   { value: "inline", label: "Inline" },
 ];
-const precisionOptions: Option<CountdownConfig["precision"]>[] = [
+const precisionOptions: ChoiceOption<CountdownConfig["precision"]>[] = [
   { value: "days", label: "Days" },
   { value: "hours", label: "Hours" },
   { value: "minutes", label: "Minutes" },
   { value: "seconds", label: "Seconds" },
 ];
-const labelOptions: Option<CountdownConfig["labels"]>[] = [
+const labelOptions: ChoiceOption<CountdownConfig["labels"]>[] = [
   { value: "long", label: "Full" },
   { value: "short", label: "Short" },
   { value: "none", label: "None" },
 ];
-const sizeOptions: Option<CountdownConfig["size"]>[] = [
-  { value: "sm", label: "S" },
-  { value: "md", label: "M" },
-  { value: "lg", label: "L" },
-];
-
-const CUSTOM_COLOR_DEFAULT = "#2383e2";
-
-/** A label above its control; `children` gets the id to attach. */
-function Field({ label, children }: { label: string; children: (id: string) => ReactNode }) {
-  const id = useId();
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id} className="font-normal">
-        {label}
-      </Label>
-      {children(id)}
-    </div>
-  );
-}
-
-function Choice<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  options: Option<T>[];
-  onChange: (value: T) => void;
-}) {
-  const labelId = useId();
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span id={labelId} className="text-sm">
-        {label}
-      </span>
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        size="sm"
-        spacing={0}
-        value={value}
-        onValueChange={(next) => {
-          if (options.some((option) => option.value === next)) onChange(next as T);
-        }}
-        aria-labelledby={labelId}
-      >
-        {options.map((option) => (
-          <ToggleGroupItem key={option.value} value={option.value}>
-            {option.label}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
-    </div>
-  );
-}
 
 function CountdownSettings({ config, onChange, children }: CountdownSettingsProps) {
-  const colorLabelId = useId();
   const update = (patch: Partial<CountdownConfig>) => onChange({ ...config, ...patch });
 
   const targetMs = resolveTarget(config.target);
   const hasTarget = !Number.isNaN(targetMs);
   const shared = isSharedInstant(config.target);
-  const customColor = isPresetColor(config.color) ? null : config.color;
 
   return (
     <Dialog>
@@ -139,7 +70,7 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
         </DialogHeader>
 
         <section className="flex flex-col gap-3">
-          <Field label="Title">
+          <SettingField label="Title">
             {(id) => (
               <Input
                 id={id}
@@ -148,8 +79,8 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
                 onChange={(event) => update({ title: event.target.value })}
               />
             )}
-          </Field>
-          <Field label="Date and time">
+          </SettingField>
+          <SettingField label="Date and time">
             {(id) => (
               <Input
                 id={id}
@@ -161,7 +92,7 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
                 }}
               />
             )}
-          </Field>
+          </SettingField>
           <SettingSwitch
             label="Same moment for every viewer"
             checked={shared}
@@ -169,14 +100,14 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
               if (hasTarget) update({ target: encodeTarget(toLocalInput(targetMs), on) });
             }}
           />
-          <Choice
+          <SettingChoice
             label="When it ends"
             value={config.afterEnd}
             options={afterEndOptions}
             onChange={(afterEnd) => update({ afterEnd })}
           />
           {config.afterEnd === "message" && (
-            <Field label="Message">
+            <SettingField label="Message">
               {(id) => (
                 <Input
                   id={id}
@@ -185,14 +116,14 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
                   onChange={(event) => update({ doneMessage: event.target.value })}
                 />
               )}
-            </Field>
+            </SettingField>
           )}
         </section>
 
         <Separator />
 
         <section className="flex flex-col gap-3">
-          <Choice
+          <SettingChoice
             label="Layout"
             value={config.layout}
             options={layoutOptions}
@@ -218,7 +149,7 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
               </SelectContent>
             </Select>
           </div>
-          <Choice
+          <SettingChoice
             label="Labels"
             value={config.labels}
             options={labelOptions}
@@ -234,73 +165,7 @@ function CountdownSettings({ config, onChange, children }: CountdownSettingsProp
         <Separator />
 
         <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-4">
-            <Label htmlFor="countdown-font" className="font-normal">
-              Font
-            </Label>
-            <Select
-              value={config.font}
-              onValueChange={(font) => update({ font: font as CountdownConfig["font"] })}
-            >
-              <SelectTrigger id="countdown-font" size="sm" className="w-36">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTDOWN_FONTS.map((font) => (
-                  <SelectItem key={font} value={font} style={{ fontFamily: FONTS[font].family }}>
-                    {FONTS[font].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Choice
-            label="Size"
-            value={config.size}
-            options={sizeOptions}
-            onChange={(size) => update({ size })}
-          />
-          <div className="flex items-center justify-between gap-4">
-            <span id={colorLabelId} className="text-sm">
-              Colour
-            </span>
-            <div role="radiogroup" aria-labelledby={colorLabelId} className="flex flex-wrap items-center gap-1.5">
-              {COUNTDOWN_COLORS.map((color) => {
-                const selected = config.color === color;
-                return (
-                  <button
-                    key={color}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    aria-label={COLORS[color].label}
-                    style={accentVars(color)}
-                    onClick={() => update({ color })}
-                    className={cn(
-                      "size-5 rounded-full border border-border bg-(--cd-light) outline-none dark:bg-(--cd-dark)",
-                      "focus-visible:ring-3 focus-visible:ring-ring/50",
-                      selected && "ring-2 ring-ring ring-offset-2 ring-offset-background"
-                    )}
-                  />
-                );
-              })}
-              <label
-                className={cn(
-                  "relative size-5 cursor-pointer overflow-hidden rounded-full border border-border",
-                  customColor && "ring-2 ring-ring ring-offset-2 ring-offset-background"
-                )}
-                style={{ background: customColor ?? "conic-gradient(red, yellow, lime, cyan, blue, magenta, red)" }}
-              >
-                <input
-                  type="color"
-                  aria-label="Custom colour"
-                  value={customColor ?? CUSTOM_COLOR_DEFAULT}
-                  onChange={(event) => update({ color: event.target.value })}
-                  className="absolute inset-0 size-full cursor-pointer opacity-0"
-                />
-              </label>
-            </div>
-          </div>
+          <AppearanceFields value={config} onChange={update} />
         </section>
       </DialogContent>
     </Dialog>

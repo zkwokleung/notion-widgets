@@ -13,8 +13,8 @@ import {
   splitDuration,
   type Direction,
 } from "./duration";
-import { accentVars, FONTS, loadFont } from "./styles";
-import { useNow } from "./useNow";
+import { accentVars, FONTS, loadFont } from "../appearance";
+import { useNow } from "@/hooks/useNow";
 
 const targetFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
 

@@ -26,7 +26,7 @@ const INLINE_SIZE: Record<CountdownConfig["size"], string> = {
 };
 
 // The accent colour comes from CSS variables set on the timer element.
-const ACCENT = "font-semibold leading-none tabular-nums text-(--cd-light) dark:text-(--cd-dark)";
+const ACCENT = "font-semibold leading-none tabular-nums text-(--accent-light) dark:text-(--accent-dark)";
 
 function CountdownDisplay({ parts, layout, labels, padZero, size }: CountdownDisplayProps) {
   if (layout === "inline") {

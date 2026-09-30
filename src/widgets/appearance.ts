@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { CountdownColor, CountdownFont } from "../../../shared/widgetConfigs";
+import type { WidgetColor, WidgetFont } from "../../shared/widgetConfigs";
 
 interface FontOption {
   label: string;
@@ -10,7 +10,7 @@ interface FontOption {
 }
 
 // Explicit import paths so Vite can split each font's CSS into its own chunk.
-export const FONTS: Record<CountdownFont, FontOption> = {
+export const FONTS: Record<WidgetFont, FontOption> = {
   system: { label: "Default" },
   serif: {
     label: "Serif",
@@ -39,10 +39,10 @@ export const FONTS: Record<CountdownFont, FontOption> = {
   },
 };
 
-const loaded = new Map<CountdownFont, Promise<unknown>>();
+const loaded = new Map<WidgetFont, Promise<unknown>>();
 
 /** Loads a font once; later calls return the same promise. */
-export function loadFont(font: CountdownFont): Promise<unknown> {
+export function loadFont(font: WidgetFont): Promise<unknown> {
   const { load } = FONTS[font];
   if (!load) return Promise.resolve();
   let pending = loaded.get(font);
@@ -54,7 +54,7 @@ export function loadFont(font: CountdownFont): Promise<unknown> {
 }
 
 /** Notion's text colours in its light and dark themes. */
-export const COLORS: Record<CountdownColor, { label: string; light: string; dark: string }> = {
+export const COLORS: Record<WidgetColor, { label: string; light: string; dark: string }> = {
   default: { label: "Default", light: "var(--foreground)", dark: "var(--foreground)" },
   gray: { label: "Gray", light: "#787774", dark: "#9b9b9b" },
   brown: { label: "Brown", light: "#9f6b53", dark: "#ba856f" },
@@ -67,12 +67,12 @@ export const COLORS: Record<CountdownColor, { label: string; light: string; dark
   red: { label: "Red", light: "#d44c47", dark: "#df5452" },
 };
 
-export function isPresetColor(color: string): color is CountdownColor {
+export function isPresetColor(color: string): color is WidgetColor {
   return Object.hasOwn(COLORS, color);
 }
 
-/** CSS variables the display reads as `text-(--cd-light) dark:text-(--cd-dark)`. */
+/** CSS variables the display reads as `text-(--accent-light) dark:text-(--accent-dark)`. */
 export function accentVars(color: string): CSSProperties {
   const { light, dark } = isPresetColor(color) ? COLORS[color] : { light: color, dark: color };
-  return { "--cd-light": light, "--cd-dark": dark } as CSSProperties;
+  return { "--accent-light": light, "--accent-dark": dark } as CSSProperties;
 }

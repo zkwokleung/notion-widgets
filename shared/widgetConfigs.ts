@@ -59,8 +59,8 @@ export const whiteboardConfigSchema = z.object({
   text: z.string().max(500).default(""),
 });
 
-export const COUNTDOWN_FONTS = ["system", "serif", "mono", "display", "rounded", "script"] as const;
-export const COUNTDOWN_COLORS = [
+export const WIDGET_FONTS = ["system", "serif", "mono", "display", "rounded", "script"] as const;
+export const WIDGET_COLORS = [
   "default",
   "gray",
   "brown",
@@ -78,6 +78,21 @@ export const COUNTDOWN_COLORS = [
 const isoDateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?$/;
 const hexColor = /^#[0-9a-f]{6}$/i;
 
+export const appearanceFields = {
+  size: z.enum(["sm", "md", "lg"]).default("md"),
+  font: z.enum(WIDGET_FONTS).default("system"),
+  /** A preset name or a #rrggbb colour. */
+  color: z
+    .string()
+    .refine(
+      (value) => (WIDGET_COLORS as readonly string[]).includes(value) || hexColor.test(value),
+      "Not a colour"
+    )
+    .default("default"),
+};
+
+export const appearanceSchema = z.object(appearanceFields);
+
 export const countdownConfigSchema = z.object({
   title: z.string().max(80).default("New Year"),
   target: z
@@ -91,16 +106,7 @@ export const countdownConfigSchema = z.object({
   precision: z.enum(["days", "hours", "minutes", "seconds"]).default("seconds"),
   labels: z.enum(["long", "short", "none"]).default("long"),
   padZero: z.boolean().default(true),
-  size: z.enum(["sm", "md", "lg"]).default("md"),
-  font: z.enum(COUNTDOWN_FONTS).default("system"),
-  /** A preset name or a #rrggbb colour. */
-  color: z
-    .string()
-    .refine(
-      (value) => (COUNTDOWN_COLORS as readonly string[]).includes(value) || hexColor.test(value),
-      "Not a colour"
-    )
-    .default("default"),
+  ...appearanceFields,
 });
 
 export type TranslatorConfig = z.infer<typeof translatorConfigSchema>;
@@ -112,8 +118,9 @@ export type DictionaryConfig = z.infer<typeof dictionaryConfigSchema>;
 export type TimerConfig = z.infer<typeof timerConfigSchema>;
 export type WhiteboardConfig = z.infer<typeof whiteboardConfigSchema>;
 export type CountdownConfig = z.infer<typeof countdownConfigSchema>;
-export type CountdownFont = (typeof COUNTDOWN_FONTS)[number];
-export type CountdownColor = (typeof COUNTDOWN_COLORS)[number];
+export type Appearance = z.infer<typeof appearanceSchema>;
+export type WidgetFont = (typeof WIDGET_FONTS)[number];
+export type WidgetColor = (typeof WIDGET_COLORS)[number];
 
 export const widgetConfigSchemas = {
   translator: translatorConfigSchema,
