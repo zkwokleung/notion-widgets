@@ -1,4 +1,12 @@
-import { BookOpen, CalendarClock, Languages, PenLine, Timer as TimerIcon, Volume2 } from "lucide-react";
+import {
+  BookOpen,
+  CalendarClock,
+  Hourglass,
+  Languages,
+  PenLine,
+  Timer as TimerIcon,
+  Volume2,
+} from "lucide-react";
 import { lazy, type ComponentType } from "react";
 import type { z } from "zod";
 import type { WidgetType } from "../../shared/api";
@@ -86,6 +94,14 @@ export const widgetDefinitions: RegisteredWidget[] = [
     Icon: CalendarClock,
     schema: widgetConfigSchemas.countdown,
     Component: lazy(() => import("./countdown/Countdown")),
+  }),
+  defineWidget({
+    type: "year-progress",
+    title: "Year Progress",
+    description: "How far through the year, month, week or day you are.",
+    Icon: Hourglass,
+    schema: widgetConfigSchemas["year-progress"],
+    Component: lazy(() => import("./year-progress/YearProgress")),
   }),
 ];
 

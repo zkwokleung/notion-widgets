@@ -30,7 +30,7 @@ test.beforeEach(async ({ page }) => {
 
 test("home lists every widget and links to its builder", async ({ page }) => {
   await page.goto("/");
-  for (const title of ["Translator", "Text-to-Speech", "Dictionary", "Focus Timer", "Handwriting", "Countdown"]) {
+  for (const title of ["Translator", "Text-to-Speech", "Dictionary", "Focus Timer", "Handwriting", "Countdown", "Year Progress"]) {
     await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
   }
   await page.getByRole("link", { name: /Dictionary/ }).click();
@@ -126,6 +126,24 @@ test("countdown counts down to its date and can be restyled", async ({ page }) =
   await page.keyboard.press("Escape");
   await expect(page.getByRole("timer")).toHaveText(/^2 Days 01 Hour 29 Minutes \d\d Seconds$/);
   await expect(page).toHaveURL(/\/countdown\?c=/);
+});
+
+test("year progress shows each period and can switch style", async ({ page }) => {
+  const config = Buffer.from(JSON.stringify({ periods: ["year", "day"], decimals: 0 })).toString("base64url");
+  await page.goto(`/year-progress?c=${config}`);
+
+  const bars = page.getByRole("progressbar");
+  await expect(bars).toHaveCount(2);
+  await expect(bars.first()).toHaveAccessibleName(new RegExp(`^Year ${new Date().getFullYear()}: \\d+\\s?% elapsed, \\d+ days? left$`));
+  await expect(bars.last()).toHaveAccessibleName(/^Day \w+: \d+\s?% elapsed, \d+ hours? left$/);
+
+  await page.getByRole("button", { name: "Year progress settings" }).click();
+  await page.getByRole("radio", { name: "Ring" }).click();
+  await page.getByRole("button", { name: "Month" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("progressbar")).toHaveCount(3);
+  await expect(page.getByRole("progressbar").locator("circle")).toHaveCount(6);
+  await expect(page).toHaveURL(/\/year-progress\?c=/);
 });
 
 test("display options apply the theme and transparency", async ({ page }) => {

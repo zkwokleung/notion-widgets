@@ -109,6 +109,18 @@ export const countdownConfigSchema = z.object({
   ...appearanceFields,
 });
 
+export const PROGRESS_PERIODS = ["year", "quarter", "month", "week", "day"] as const;
+
+export const yearProgressConfigSchema = z.object({
+  title: z.string().max(80).default(""),
+  periods: z.array(z.enum(PROGRESS_PERIODS)).min(1).max(PROGRESS_PERIODS.length).default(["year"]),
+  style: z.enum(["bar", "ring", "dots"]).default("bar"),
+  decimals: z.number().int().min(0).max(2).default(1),
+  showRemaining: z.boolean().default(true),
+  weekStart: z.enum(["monday", "sunday"]).default("monday"),
+  ...appearanceFields,
+});
+
 export type TranslatorConfig = z.infer<typeof translatorConfigSchema>;
 export type SpeechEntry = z.infer<typeof speechEntrySchema>;
 export type TextToSpeechConfig = z.infer<typeof textToSpeechConfigSchema>;
@@ -118,6 +130,8 @@ export type DictionaryConfig = z.infer<typeof dictionaryConfigSchema>;
 export type TimerConfig = z.infer<typeof timerConfigSchema>;
 export type WhiteboardConfig = z.infer<typeof whiteboardConfigSchema>;
 export type CountdownConfig = z.infer<typeof countdownConfigSchema>;
+export type YearProgressConfig = z.infer<typeof yearProgressConfigSchema>;
+export type ProgressPeriod = (typeof PROGRESS_PERIODS)[number];
 export type Appearance = z.infer<typeof appearanceSchema>;
 export type WidgetFont = (typeof WIDGET_FONTS)[number];
 export type WidgetColor = (typeof WIDGET_COLORS)[number];
@@ -129,6 +143,7 @@ export const widgetConfigSchemas = {
   timer: timerConfigSchema,
   whiteboard: whiteboardConfigSchema,
   countdown: countdownConfigSchema,
+  "year-progress": yearProgressConfigSchema,
 } satisfies Record<WidgetType, z.ZodType>;
 
 export type WidgetConfigMap = {
@@ -142,6 +157,7 @@ export const createWidgetBodySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("timer"), config: timerConfigSchema }),
   z.object({ type: z.literal("whiteboard"), config: whiteboardConfigSchema }),
   z.object({ type: z.literal("countdown"), config: countdownConfigSchema }),
+  z.object({ type: z.literal("year-progress"), config: yearProgressConfigSchema }),
 ]);
 
 export const updateWidgetBodySchema = z.object({ config: z.unknown() });

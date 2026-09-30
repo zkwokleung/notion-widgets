@@ -12,6 +12,8 @@ re-copied after you edit it.
 | **Focus Timer** | A Pomodoro timer (focus / short break / long break) that survives Notion reloading the embed. |
 | **Handwriting** | Draw characters you can't type yet (kanji, hanzi, hangul…), then translate and hear them. |
 | **Countdown** | Count down to a date (or up from it), with your choice of layout, units, font, size and colour. |
+| **Year Progress** | How far through the year, quarter, month, week or day you are, as bars, rings or dots. |
+| **Year Progress** | How far through the year, quarter, month, week or day you are, as bars, rings or dots. |
 
 ## Embedding in Notion
 
