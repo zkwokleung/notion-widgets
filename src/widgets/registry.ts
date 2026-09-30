@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CalendarClock,
+  Globe,
   Hourglass,
   Languages,
   PenLine,
@@ -102,6 +103,14 @@ export const widgetDefinitions: RegisteredWidget[] = [
     Icon: Hourglass,
     schema: widgetConfigSchemas["year-progress"],
     Component: lazy(() => import("./year-progress/YearProgress")),
+  }),
+  defineWidget({
+    type: "world-clock",
+    title: "World Clock",
+    description: "The current time in the places that matter to you.",
+    Icon: Globe,
+    schema: widgetConfigSchemas["world-clock"],
+    Component: lazy(() => import("./world-clock/WorldClock")),
   }),
 ];
 

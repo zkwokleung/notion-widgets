@@ -8,6 +8,7 @@ export const WIDGET_TYPES = [
   "whiteboard",
   "countdown",
   "year-progress",
+  "world-clock",
 ] as const;
 
 export type WidgetType = (typeof WIDGET_TYPES)[number];

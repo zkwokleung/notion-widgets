@@ -121,6 +121,43 @@ export const yearProgressConfigSchema = z.object({
   ...appearanceFields,
 });
 
+export const MAX_CLOCKS = 12;
+
+export function isValidTimeZone(zone: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: zone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export const clockSchema = z.object({
+  id: rowId,
+  timeZone: z.string().max(64).refine(isValidTimeZone, "Unknown time zone"),
+  /** Empty shows the zone's city name. */
+  label: z.string().max(40).default(""),
+});
+
+const DEFAULT_ZONES = ["Europe/London", "America/New_York", "Asia/Tokyo"];
+
+function defaultClocks(): z.output<typeof clockSchema>[] {
+  const local = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const zones = [local, ...DEFAULT_ZONES.filter((zone) => zone !== local)];
+  return zones.map((timeZone) => ({ id: crypto.randomUUID(), timeZone, label: "" }));
+}
+
+export const worldClockConfigSchema = z.object({
+  title: z.string().max(80).default(""),
+  clocks: z.array(clockSchema).min(1).max(MAX_CLOCKS).default(defaultClocks),
+  layout: z.enum(["list", "grid"]).default("list"),
+  hourCycle: z.enum(["auto", "h12", "h23"]).default("auto"),
+  showSeconds: z.boolean().default(false),
+  showDate: z.boolean().default(true),
+  showOffset: z.boolean().default(true),
+  ...appearanceFields,
+});
+
 export type TranslatorConfig = z.infer<typeof translatorConfigSchema>;
 export type SpeechEntry = z.infer<typeof speechEntrySchema>;
 export type TextToSpeechConfig = z.infer<typeof textToSpeechConfigSchema>;
@@ -131,6 +168,8 @@ export type TimerConfig = z.infer<typeof timerConfigSchema>;
 export type WhiteboardConfig = z.infer<typeof whiteboardConfigSchema>;
 export type CountdownConfig = z.infer<typeof countdownConfigSchema>;
 export type YearProgressConfig = z.infer<typeof yearProgressConfigSchema>;
+export type WorldClockConfig = z.infer<typeof worldClockConfigSchema>;
+export type Clock = z.infer<typeof clockSchema>;
 export type ProgressPeriod = (typeof PROGRESS_PERIODS)[number];
 export type Appearance = z.infer<typeof appearanceSchema>;
 export type WidgetFont = (typeof WIDGET_FONTS)[number];
@@ -144,6 +183,7 @@ export const widgetConfigSchemas = {
   whiteboard: whiteboardConfigSchema,
   countdown: countdownConfigSchema,
   "year-progress": yearProgressConfigSchema,
+  "world-clock": worldClockConfigSchema,
 } satisfies Record<WidgetType, z.ZodType>;
 
 export type WidgetConfigMap = {
@@ -158,6 +198,7 @@ export const createWidgetBodySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("whiteboard"), config: whiteboardConfigSchema }),
   z.object({ type: z.literal("countdown"), config: countdownConfigSchema }),
   z.object({ type: z.literal("year-progress"), config: yearProgressConfigSchema }),
+  z.object({ type: z.literal("world-clock"), config: worldClockConfigSchema }),
 ]);
 
 export const updateWidgetBodySchema = z.object({ config: z.unknown() });
