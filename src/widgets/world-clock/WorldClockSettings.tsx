@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { useId, useMemo, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,7 +17,8 @@ import SettingField from "@/components/widget/SettingField";
 import SettingSwitch from "@/components/widget/SettingSwitch";
 import { MAX_CLOCKS, type Clock, type WorldClockConfig } from "../../../shared/widgetConfigs";
 import ClockRow from "./ClockRow";
-import { viewerTimeZone, zoneOptions } from "./zones";
+import { ZoneDatalist } from "./ZoneInput";
+import { viewerTimeZone } from "./zones";
 
 interface WorldClockSettingsProps {
   config: WorldClockConfig;
@@ -38,7 +39,6 @@ const hourCycleOptions: ChoiceOption<WorldClockConfig["hourCycle"]>[] = [
 function WorldClockSettings({ config, onChange, children }: WorldClockSettingsProps) {
   const zoneListId = useId();
   const clocksLabelId = useId();
-  const zones = useMemo(() => zoneOptions(), []);
   const { clocks } = config;
 
   const update = (patch: Partial<WorldClockConfig>) => onChange({ ...config, ...patch });
@@ -94,11 +94,7 @@ function WorldClockSettings({ config, onChange, children }: WorldClockSettingsPr
                 />
               ))}
             </ul>
-            <datalist id={zoneListId}>
-              {zones.map((zone) => (
-                <option key={zone} value={zone} />
-              ))}
-            </datalist>
+            <ZoneDatalist id={zoneListId} />
             <Button
               type="button"
               variant="ghost"
